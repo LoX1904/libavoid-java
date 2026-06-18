@@ -59,9 +59,6 @@ class MinimumTerminalSpanningTree {
     private HyperedgeTreeNode m_rootJunction;
     private final double bendPenalty;
 
-    // C++: VertexSetList allsets — union-find sets
-    private final List<Set<VertInf>> allsets = new ArrayList<>();
-
     private final List<VertInf> extraVertices = new ArrayList<>();
     // C++: std::list<VertInf **> rootVertexPointers — in Java, list of 1-element arrays
     private final List<VertInf[]> rootVertexPointers = new ArrayList<>();
@@ -103,49 +100,6 @@ class MinimumTerminalSpanningTree {
     }
 
     /**
-     * Creates a singleton set for the given vertex in the union-find structure.
-     * Translated from MinimumTerminalSpanningTree::makeSet()
-     * in mtst.cpp lines 104-109.
-     */
-    private void makeSet(VertInf vertex) {
-        Set<VertInf> newSet = new HashSet<>();
-        newSet.add(vertex);
-        allsets.add(newSet);
-    }
-
-    /**
-     * Finds the set containing the given vertex in the union-find structure.
-     * Returns the index into allsets, or -1 if not found.
-     * Translated from MinimumTerminalSpanningTree::findSet()
-     * in mtst.cpp lines 111-122.
-     */
-    private int findSet(VertInf vertex) {
-        for (int i = 0; i < allsets.size(); i++) {
-            if (allsets.get(i).contains(vertex)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Merges two sets in the union-find structure.
-     * Translated from MinimumTerminalSpanningTree::unionSets()
-     * in mtst.cpp lines 124-133.
-     */
-    private void unionSets(int s1, int s2) {
-        Set<VertInf> merged = new HashSet<>(allsets.get(s1));
-        merged.addAll(allsets.get(s2));
-
-        // Remove s1 and s2 (remove higher index first to avoid index shift)
-        int hi = Math.max(s1, s2);
-        int lo = Math.min(s1, s2);
-        allsets.remove(hi);
-        allsets.remove(lo);
-        allsets.add(merged);
-    }
-
-    /**
      * Adds or finds a node in the hyperedge tree for the given vertex.
      * Creates a junction if the node is visited a second time.
      * Translated from MinimumTerminalSpanningTree::addNode()
@@ -165,20 +119,19 @@ class MinimumTerminalSpanningTree {
             node = newNode;
         } else {
             // Found.
-            HyperedgeTreeNode junctionNode = match;
-            if (junctionNode.junction == null) {
+            if (match.junction == null) {
                 // Create a junction, if one has not already been created.
-                junctionNode.junction = new JunctionRef(router, vertex.point);
+                match.junction = new JunctionRef(router, vertex.point);
                 if (m_rootJunction == null) {
                     // Remember the first junction node, so we can use it to
                     // traverse the tree, adding and connecting connectors to
                     // junctions and endpoints.
-                    m_rootJunction = junctionNode;
+                    m_rootJunction = match;
                 }
-                router.removeObjectFromQueuedActions(junctionNode.junction);
-                junctionNode.junction.makeActive();
+                router.removeObjectFromQueuedActions(match.junction);
+                match.junction.makeActive();
             }
-            node = junctionNode;
+            node = match;
         }
 
         if (prevNode != null) {

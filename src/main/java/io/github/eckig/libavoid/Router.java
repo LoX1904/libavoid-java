@@ -24,6 +24,7 @@
 package io.github.eckig.libavoid;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -82,8 +83,7 @@ public class Router {
         portDirectionPenalty(5),
         shapeBufferDistance(6),
         idealNudgingDistance(7),
-        reverseDirectionPenalty(8),
-        lastRoutingParameterMarker(9);
+        reverseDirectionPenalty(8);
 
         public final int value;
 
@@ -103,8 +103,7 @@ public class Router {
         nudgeOrthogonalTouchingColinearSegments(3),
         performUnifyingNudgingPreprocessingStep(4),
         improveHyperedgeRoutesMovingAddingAndDeletingJunctions(5),
-        nudgeSharedPathsWithCommonEndPoint(6),
-        lastRoutingOptionMarker(7);
+        nudgeSharedPathsWithCommonEndPoint(6);
 
         public final int value;
 
@@ -440,15 +439,13 @@ public class Router {
             m_allows_orthogonal_routing = true;
         }
 
-        m_routing_parameters = new double[RoutingParameter.lastRoutingParameterMarker.value];
-        for (int p = 0; p < RoutingParameter.lastRoutingParameterMarker.value; ++p) {
-            m_routing_parameters[p] = 0.0;
-        }
+        m_routing_parameters = new double[RoutingParameter.values().length];
+        Arrays.fill(m_routing_parameters, 0.0);
         m_routing_parameters[RoutingParameter.segmentPenalty.value] = 10;
         m_routing_parameters[RoutingParameter.clusterCrossingPenalty.value] = 4000;
         m_routing_parameters[RoutingParameter.idealNudgingDistance.value] = 4.0;
 
-        m_routing_options = new boolean[RoutingOption.lastRoutingOptionMarker.value];
+        m_routing_options = new boolean[RoutingOption.values().length];
         m_routing_options[RoutingOption.nudgeOrthogonalSegmentsConnectedToShapes.value] = false;
         m_routing_options[RoutingOption.improveHyperedgeRoutesMovingJunctions.value] = true;
         m_routing_options[RoutingOption.penaliseOrthogonalSharedPathsAtConnEnds.value] = false;
@@ -980,7 +977,6 @@ public class Router {
      * Sets values for routing parameters, including routing penalties.
      */
     public void setRoutingParameter(RoutingParameter parameter, double value) {
-        assert parameter.value < RoutingParameter.lastRoutingParameterMarker.value;
         if (value < 0) {
             // Set some sensible parameter value for the parameter being 'active'.
             switch (parameter) {
@@ -1026,7 +1022,6 @@ public class Router {
      * Returns the current value for a particular routing parameter.
      */
     public double routingParameter(RoutingParameter parameter) {
-        assert parameter.value < RoutingParameter.lastRoutingParameterMarker.value;
         return m_routing_parameters[parameter.value];
     }
 
@@ -1034,7 +1029,6 @@ public class Router {
      * Turn specific routing options on or off.
      */
     public void setRoutingOption(RoutingOption option, boolean value) {
-        assert option.value < RoutingOption.lastRoutingOptionMarker.value;
         m_routing_options[option.value] = value;
         m_settings_changes = true;
     }
@@ -1043,7 +1037,6 @@ public class Router {
      * Returns the current state for a specific routing option.
      */
     public boolean routingOption(RoutingOption option) {
-        assert option.value < RoutingOption.lastRoutingOptionMarker.value;
         return m_routing_options[option.value];
     }
 

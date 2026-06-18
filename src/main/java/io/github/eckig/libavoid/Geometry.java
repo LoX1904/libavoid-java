@@ -32,11 +32,11 @@ public final class Geometry {
     {
         DONT_INTERSECT,
         DO_INTERSECT,
-        PARALLEL;
+        PARALLEL
     }
 
-    private static final Pair<Intersection, Point> DONT_INTERSECT = new Pair<Intersection, Point>(Intersection.DONT_INTERSECT, new Point(0, 0));
-    private static final Pair<Intersection, Point> PARALLEL = new Pair<Intersection, Point>(Intersection.PARALLEL, new Point(0, 0));
+    private static final Pair<Intersection, Point> DONT_INTERSECT = new Pair<>(Intersection.DONT_INTERSECT, new Point(0, 0));
+    private static final Pair<Intersection, Point> PARALLEL = new Pair<>(Intersection.PARALLEL, new Point(0, 0));
 
     private Geometry() {}
 
@@ -69,22 +69,6 @@ public final class Geometry {
 
     public static double manhattanDist(Point a, Point b) {
         return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-    }
-
-    public static double dist(Point a, Point b) {
-        return euclideanDist(a, b);
-    }
-
-    public static double angle(Point a, Point b, Point c) {
-        double ux = b.x - a.x;
-        double uy = b.y - a.y;
-        double vx = c.x - b.x;
-        double vy = c.y - b.y;
-        double lu = Math.sqrt(ux * ux + uy * uy);
-        double lv = Math.sqrt(vx * vx + vy * vy);
-        double udotv = ux * vx + uy * vy;
-        double costheta = udotv / (lu * lv);
-        return Math.acos(costheta);
     }
 
     public static boolean inBetween(Point a, Point b, Point c) {
