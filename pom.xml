@@ -6,11 +6,47 @@
 
     <groupId>io.github.eckig</groupId>
     <artifactId>libavoid</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
+
+    <description>Java Port of Adaptagrams libavoid</description>
+    <url>https://github.com/eckig/libavoid-java</url>
+
+    <licenses>
+        <license>
+            <name>LGPL-2.1</name>
+            <url>https://www.gnu.org/licenses/old-licenses/lgpl-2.1</url>
+        </license>
+    </licenses>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <developers>
+        <developer>
+            <name>Steffen Rachner</name>
+            <email>steffen.rachner@t-systems.com</email>
+            <organization>T-Systems Information Services GmbH</organization>
+            <organizationUrl>http://www.t-systems-ifs.com/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:eckig/libavoid-java.git</connection>
+        <developerConnection>scm:git:git@github.com:eckig/libavoid-java.git</developerConnection>
+        <url>git@github.com:eckig/libavoid-java.git</url>
+    </scm>
 
     <properties>
-        <maven.compiler.source>26</maven.compiler.source>
-        <maven.compiler.target>26</maven.compiler.target>
+        <maven.compiler.source>24</maven.compiler.source>
+        <maven.compiler.target>24</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
@@ -32,7 +68,87 @@
                     <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jreleaser</groupId>
+                <artifactId>jreleaser-maven-plugin</artifactId>
+                <version>1.24.0</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <jreleaser>
+                        <signing>
+                            <pgp>
+                                <active>ALWAYS</active>
+                                <armored>true</armored>
+                            </pgp>
+                        </signing>
+                        <deploy>
+                            <maven>
+                                <maven-central>
+                                    <sonatype>
+                                        <active>RELEASE</active>
+                                        <url>https://central.sonatype.com/api/v1/publisher</url>
+                                        <stagingRepositories>target/staging-deploy</stagingRepositories>
+                                    </sonatype>
+                                </maven-central>
+                            </maven>
+                        </deploy>
+                    </jreleaser>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>publication</id>
+            <properties>
+                <skipTests>true</skipTests>
+                <altDeploymentRepository>local::file:./target/staging-deploy</altDeploymentRepository>
+                <altReleaseDeploymentRepository>local::file:./target/staging-deploy</altReleaseDeploymentRepository>
+                <altSnapshotDeploymentRepository>local::file:./target/staging-deploy</altSnapshotDeploymentRepository>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.12.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <doclint>none</doclint>
+                            <quiet>true</quiet>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.4.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>3.1.4</version>
+                        <configuration>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
