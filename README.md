@@ -1,1 +1,1 @@
-# libavoid-java
+This is an LLM based conversion of the original [C++ adaptagrams libavoid library](https://github.com/mjwybrow/adaptagrams) to java.

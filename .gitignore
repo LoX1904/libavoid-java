@@ -1,0 +1,9 @@
+.project
+.settings
+.classpath
+.pmd
+.checkstyle
+target/
+.idea/
+**.iml
+.DS_STORE
