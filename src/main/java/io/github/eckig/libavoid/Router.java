@@ -75,21 +75,72 @@ public class Router {
      * Corresponds to C++ enum RoutingParameter.
      */
     public enum RoutingParameter {
-        segmentPenalty(0),
-        anglePenalty(1),
-        crossingPenalty(2),
-        clusterCrossingPenalty(3),
-        fixedSharedPathPenalty(4),
-        portDirectionPenalty(5),
-        shapeBufferDistance(6),
-        idealNudgingDistance(7),
-        reverseDirectionPenalty(8);
-
-        public final int value;
-
-        RoutingParameter(int value) {
-            this.value = value;
-        }
+        /**
+         * This penalty is applied for each segment in the connector path beyond the first.
+         * This should always normally be set when doing orthogonal routing to prevent step-like connector paths.
+         * <p>
+         * <b>Note</b>
+         * This penalty must be set (i.e., be greater than zero) in order for orthogonal connector nudging to be
+         * performed, since this requires reasonable initial routes.
+         */
+        segmentPenalty,
+        /**
+         * This penalty is applied in its full amount to tight acute bends in the connector path.
+         * A smaller portion of the penalty is applied for slight bends, i.e., where the bend is close to 180 degrees.
+         * This is useful for polyline routing where there is some evidence that tighter corners are worse for
+         * readability, but that slight bends might not be so bad, especially when smoothed by curves.
+         */
+        anglePenalty,
+        /**
+         * This penalty is applied whenever a connector path crosses another connector path.
+         * It takes shared paths into consideration and the penalty is only applied if there is an actual crossing.
+         * <p>
+         * <b>Note</b>
+         * This penalty is still experimental! It is not recommended for normal use.
+         */
+        crossingPenalty,
+        /**
+         * This penalty is applied whenever a connector path crosses a cluster boundary.
+         * <p>
+         * <b>Note</b>
+         * This penalty is still experimental! It is not recommended for normal use.
+         * This penalty is very slow.
+         */
+        clusterCrossingPenalty,
+        /**
+         * This penalty is applied whenever a connector path shares some segments with an immovable portion of an
+         * existing connector route (such as the first or last segment of a connector).
+         * <p>
+         * <b>Note</b>
+         * This penalty is still experimental! It is not recommended for normal use.
+         */
+        fixedSharedPathPenalty,
+        /**
+         * This penalty is applied to port selection choice when the other end of the connector being routed does not
+         * appear in any of the 90 degree visibility cones centered on the visibility directions for the port.
+         * <p>
+         * <b>Note</b>
+         * This penalty is still experimental! It is not recommended for normal use.
+         * This penalty is very slow.
+         */
+        portDirectionPenalty,
+        /**
+         * This parameter defines the spacing distance that will be added to the sides of each shape when determining
+         * obstacle sizes for routing. This controls how closely connectors pass shapes, and can be used to prevent
+         * connectors overlapping with shape boundaries. By default, this distance is set to a value of 0.
+         */
+        shapeBufferDistance,
+        /**
+         * This parameter defines the spacing distance that will be used for nudging apart overlapping corners and line
+         * segments of connectors. By default, this distance is set to a value of 4.
+         */
+        idealNudgingDistance,
+        /**
+         * This penalty is applied whenever a connector path travels in the direction opposite of the destination from
+         * the source endpoint. By default this penalty is set to zero. This shouldn't be needed in most cases but can
+         * be useful if you use penalties such as crossingPenalty which cause connectors to loop around obstacles.
+         */
+        reverseDirectionPenalty
     }
 
     /**
@@ -97,19 +148,60 @@ public class Router {
      * Corresponds to C++ enum RoutingOption.
      */
     public enum RoutingOption {
-        nudgeOrthogonalSegmentsConnectedToShapes(0),
-        improveHyperedgeRoutesMovingJunctions(1),
-        penaliseOrthogonalSharedPathsAtConnEnds(2),
-        nudgeOrthogonalTouchingColinearSegments(3),
-        performUnifyingNudgingPreprocessingStep(4),
-        improveHyperedgeRoutesMovingAddingAndDeletingJunctions(5),
-        nudgeSharedPathsWithCommonEndPoint(6);
-
-        public final int value;
-
-        RoutingOption(int value) {
-            this.value = value;
-        }
+        /**
+         * This option causes the final segments of connectors, which are attached to shapes, to be nudged apart.
+         * Usually these segments are fixed, since they are considered to be attached to ports.
+         *
+         * <p>Defaults to false.
+         *
+         * <p>This option also causes routes running through the same checkpoint to be nudged apart.
+         *
+         * <p>This option has no effect if nudgeSharedPathsWithCommonEndPoint is set to false,
+         *
+         * <p><b>Note</b>
+         * This will allow routes to be nudged up to the bounds of shapes.
+         */
+        nudgeOrthogonalSegmentsConnectedToShapes,
+        /**
+         * This option penalises and attempts to reroute orthogonal shared connector paths terminating at a common
+         * junction or shape connection pin. When multiple connector paths enter or leave the same side of a junction
+         * (or shape pin), the router will attempt to reroute these to different sides of the junction or different
+         * shape pins.
+         *
+         * <p>Defaults to false.
+         *
+         * <p>This option depends on the fixedSharedPathPenalty penalty having been set.
+         *
+         * See also {@link RoutingParameter#fixedSharedPathPenalty}
+         * <p><b>Note</b>
+         * This option is still experimental! It is not recommended for normal use.
+         */
+        penaliseOrthogonalSharedPathsAtConnEnds,
+        /**
+         * This option can be used to control whether collinear line segments that touch just at their ends will be
+         * nudged apart. The overlap will usually be resolved in the other dimension, so this is not usually required.
+         *
+         * <p>Defaults to false.
+         */
+        nudgeOrthogonalTouchingColinearSegments,
+        /**
+         * This option can be used to control whether the router performs a preprocessing step before orthogonal
+         * nudging where is tries to unify segments and centre them in free space. This generally results in better
+         * quality ordering and nudging.
+         *
+         * <p>Defaults to true.
+         *
+         * <p>You may wish to turn this off for large examples where it can be very slow and will make little difference.
+         */
+        performUnifyingNudgingPreprocessingStep,
+        /**
+         * This option determines whether intermediate segments of connectors that are attached to common endpoints
+         * will be nudged apart. Usually these segments get nudged apart, but you may want to turn this off if you
+         * would prefer that entire shared paths terminating at a common end point should overlap.
+         *
+         * <p>Defaults to true.
+         */
+        nudgeSharedPathsWithCommonEndPoint
     }
 
     // -----------------------------------------------------------------------
@@ -371,8 +463,6 @@ public class Router {
     private final boolean[] m_routing_options;
 
     ConnRerouteFlagDelegate m_conn_reroute_flags;
-    private final HyperedgeRerouter m_hyperedge_rerouter;
-    HyperedgeImprover m_hyperedge_improver;
 
     // Progress tracking and transaction cancelling.
     private boolean m_abort_transaction;
@@ -441,23 +531,18 @@ public class Router {
 
         m_routing_parameters = new double[RoutingParameter.values().length];
         Arrays.fill(m_routing_parameters, 0.0);
-        m_routing_parameters[RoutingParameter.segmentPenalty.value] = 10;
-        m_routing_parameters[RoutingParameter.clusterCrossingPenalty.value] = 4000;
-        m_routing_parameters[RoutingParameter.idealNudgingDistance.value] = 4.0;
+        m_routing_parameters[RoutingParameter.segmentPenalty.ordinal()] = 10;
+        m_routing_parameters[RoutingParameter.clusterCrossingPenalty.ordinal()] = 4000;
+        m_routing_parameters[RoutingParameter.idealNudgingDistance.ordinal()] = 4.0;
 
         m_routing_options = new boolean[RoutingOption.values().length];
-        m_routing_options[RoutingOption.nudgeOrthogonalSegmentsConnectedToShapes.value] = false;
-        m_routing_options[RoutingOption.improveHyperedgeRoutesMovingJunctions.value] = true;
-        m_routing_options[RoutingOption.penaliseOrthogonalSharedPathsAtConnEnds.value] = false;
-        m_routing_options[RoutingOption.nudgeOrthogonalTouchingColinearSegments.value] = false;
-        m_routing_options[RoutingOption.performUnifyingNudgingPreprocessingStep.value] = true;
-        m_routing_options[RoutingOption.improveHyperedgeRoutesMovingAddingAndDeletingJunctions.value] = false;
-        m_routing_options[RoutingOption.nudgeSharedPathsWithCommonEndPoint.value] = true;
+        m_routing_options[RoutingOption.nudgeOrthogonalSegmentsConnectedToShapes.ordinal()] = false;
+        m_routing_options[RoutingOption.penaliseOrthogonalSharedPathsAtConnEnds.ordinal()] = false;
+        m_routing_options[RoutingOption.nudgeOrthogonalTouchingColinearSegments.ordinal()] = false;
+        m_routing_options[RoutingOption.performUnifyingNudgingPreprocessingStep.ordinal()] = true;
+        m_routing_options[RoutingOption.nudgeSharedPathsWithCommonEndPoint.ordinal()] = true;
 
         m_conn_reroute_flags = new ConnRerouteFlagDelegate();
-        m_hyperedge_rerouter = new HyperedgeRerouter();
-        m_hyperedge_rerouter.setRouter(this);
-        m_hyperedge_improver = new HyperedgeImprover();
 
         m_abort_transaction = false;
     }
@@ -501,8 +586,7 @@ public class Router {
      */
     public boolean processTransaction() {
         // If SimpleRouting, then don't update here.
-        if ((actionList.isEmpty() && (m_hyperedge_rerouter.count() == 0) &&
-                !m_settings_changes) || SimpleRouting) {
+        if ((actionList.isEmpty() && !m_settings_changes) || SimpleRouting) {
             return false;
         }
         m_settings_changes = false;
@@ -944,7 +1028,7 @@ public class Router {
     public void setRoutingParameter(int parameterOrdinal, double value) {
         RoutingParameter[] params = RoutingParameter.values();
         for (RoutingParameter p : params) {
-            if (p.value == parameterOrdinal) {
+            if (p.ordinal() == parameterOrdinal) {
                 setRoutingParameter(p, value);
                 return;
             }
@@ -958,7 +1042,7 @@ public class Router {
     public void setRoutingOption(int optionOrdinal, boolean value) {
         RoutingOption[] options = RoutingOption.values();
         for (RoutingOption o : options) {
-            if (o.value == optionOrdinal) {
+            if (o.ordinal() == optionOrdinal) {
                 setRoutingOption(o, value);
                 return;
             }
@@ -981,32 +1065,32 @@ public class Router {
             // Set some sensible parameter value for the parameter being 'active'.
             switch (parameter) {
                 case segmentPenalty:
-                    m_routing_parameters[parameter.value] = 50;
+                    m_routing_parameters[parameter.ordinal()] = 50;
                     break;
                 case fixedSharedPathPenalty:
-                    m_routing_parameters[parameter.value] = 110;
+                    m_routing_parameters[parameter.ordinal()] = 110;
                     break;
                 case anglePenalty:
-                    m_routing_parameters[parameter.value] = 50;
+                    m_routing_parameters[parameter.ordinal()] = 50;
                     break;
                 case crossingPenalty:
-                    m_routing_parameters[parameter.value] = 200;
+                    m_routing_parameters[parameter.ordinal()] = 200;
                     break;
                 case clusterCrossingPenalty:
-                    m_routing_parameters[parameter.value] = 4000;
+                    m_routing_parameters[parameter.ordinal()] = 4000;
                     break;
                 case idealNudgingDistance:
-                    m_routing_parameters[parameter.value] = 4.0;
+                    m_routing_parameters[parameter.ordinal()] = 4.0;
                     break;
                 case portDirectionPenalty:
-                    m_routing_parameters[parameter.value] = 100;
+                    m_routing_parameters[parameter.ordinal()] = 100;
                     break;
                 default:
-                    m_routing_parameters[parameter.value] = 50;
+                    m_routing_parameters[parameter.ordinal()] = 50;
                     break;
             }
         } else {
-            m_routing_parameters[parameter.value] = value;
+            m_routing_parameters[parameter.ordinal()] = value;
         }
         m_settings_changes = true;
     }
@@ -1022,14 +1106,14 @@ public class Router {
      * Returns the current value for a particular routing parameter.
      */
     public double routingParameter(RoutingParameter parameter) {
-        return m_routing_parameters[parameter.value];
+        return m_routing_parameters[parameter.ordinal()];
     }
 
     /**
      * Turn specific routing options on or off.
      */
     public void setRoutingOption(RoutingOption option, boolean value) {
-        m_routing_options[option.value] = value;
+        m_routing_options[option.ordinal()] = value;
         m_settings_changes = true;
     }
 
@@ -1037,7 +1121,7 @@ public class Router {
      * Returns the current state for a specific routing option.
      */
     public boolean routingOption(RoutingOption option) {
-        return m_routing_options[option.value];
+        return m_routing_options[option.ordinal()];
     }
 
     /**
@@ -1071,17 +1155,6 @@ public class Router {
     }
 
     // -----------------------------------------------------------------------
-    // Hyperedge rerouter
-    // -----------------------------------------------------------------------
-
-    /**
-     * Returns a reference to the hyperedge rerouter for the router.
-     */
-    public HyperedgeRerouter hyperedgeRerouter() {
-        return m_hyperedge_rerouter;
-    }
-
-    // -----------------------------------------------------------------------
     // Crossing penalty rerouting stage
     // -----------------------------------------------------------------------
 
@@ -1110,16 +1183,7 @@ public class Router {
             conn.freeActivePins();
         }
 
-        // Calculate and return connectors that are part of hyperedges and will
-        // be completely rerouted by that code.
-        Set<ConnRef> hyperedgeConns = calcHyperedgeConnectors();
-
         for (ConnRef connector : new ArrayList<>(m_connectors)) {
-
-            if (hyperedgeConns.contains(connector)) {
-                // This will be rerouted by the hyperedge code, so do nothing.
-                continue;
-            }
 
             if (connector.hasFixedRoute()) {
                 // We don't reroute connectors with fixed routes.
@@ -1144,8 +1208,8 @@ public class Router {
             }
         }
         if (!failedConns.isEmpty()) {
-            double originalBuffer = m_routing_parameters[RoutingParameter.shapeBufferDistance.value];
-            m_routing_parameters[RoutingParameter.shapeBufferDistance.value] = 0;
+            double originalBuffer = m_routing_parameters[RoutingParameter.shapeBufferDistance.ordinal()];
+            m_routing_parameters[RoutingParameter.shapeBufferDistance.ordinal()] = 0;
             m_static_orthogonal_graph_invalidated = true;
             regenerateStaticBuiltGraph();
 
@@ -1156,60 +1220,23 @@ public class Router {
 
             // Restore original buffer and rebuild the graph so that all
             // subsequent steps (crossing detection, nudging) use the correct buffer.
-            m_routing_parameters[RoutingParameter.shapeBufferDistance.value] = originalBuffer;
+            m_routing_parameters[RoutingParameter.shapeBufferDistance.ordinal()] = originalBuffer;
             m_static_orthogonal_graph_invalidated = true;
             regenerateStaticBuiltGraph();
         }
 
-        // Perform any complete hyperedge rerouting that has been requested.
-        m_hyperedge_rerouter.performRerouting();
-
         // Find and reroute crossing connectors if crossing penalties are set.
         improveCrossings();
-
-        // Improve hyperedge routes by moving junctions if enabled.
-        boolean withMinorImprovements =
-                m_routing_options[RoutingOption.improveHyperedgeRoutesMovingJunctions.value];
-        boolean canMakeMajorChanges =
-                m_routing_options[RoutingOption.improveHyperedgeRoutesMovingAddingAndDeletingJunctions.value];
-        if (withMinorImprovements || canMakeMajorChanges) {
-            m_hyperedge_improver.clear();
-            m_hyperedge_improver.setRouter(this);
-            m_hyperedge_improver.execute(canMakeMajorChanges);
-        }
 
         // Perform centring and nudging for orthogonal routes.
         ImproveOrthogonalRoutes improver = new ImproveOrthogonalRoutes(this);
         improver.execute();
 
-        // C++ router.cpp:1003-1017 — Find deleted connectors from hyperedges.
-        HyperedgeNewAndDeletedObjectLists changedHyperedgeObjs =
-                m_hyperedge_improver.newAndDeletedObjectLists();
-        List<ConnRef> deletedConns = new ArrayList<>(changedHyperedgeObjs.deletedConnectorList);
-        for (int index = 0; index < m_hyperedge_rerouter.count(); ++index) {
-            changedHyperedgeObjs = m_hyperedge_rerouter.newAndDeletedObjectLists(index);
-            deletedConns.addAll(changedHyperedgeObjs.deletedConnectorList);
-        }
-
         // Alert connectors that they need redrawing.
         for (ConnRef conn : reroutedConns) {
-            // Skip hyperedge connectors which have been deleted.
-            if (deletedConns.contains(conn)) {
-                continue;
-            }
             conn.m_needs_repaint = true;
             conn.performCallback();
         }
-    }
-
-    // generatePath(ConnRef) wrapper removed — C++ calls connector->generatePath() directly
-    // (router.cpp:973-974), which already checks needsReroute internally.
-
-    /**
-     * Returns the set of connectors that will be rerouted by hyperedge code.
-     */
-    private Set<ConnRef> calcHyperedgeConnectors() {
-        return m_hyperedge_rerouter.calcHyperedgeConnectors();
     }
 
     // -----------------------------------------------------------------------
@@ -1460,7 +1487,7 @@ public class Router {
                     if ((shared_path_penalty > 0) &&
                             (cross.crossingFlags & ConnectorCrossings.CROSSING_SHARES_PATH) != 0 &&
                             (cross.crossingFlags & ConnectorCrossings.CROSSING_SHARES_FIXED_SEGMENT) != 0 &&
-                            (m_routing_options[RoutingOption.penaliseOrthogonalSharedPathsAtConnEnds.value] ||
+                            (m_routing_options[RoutingOption.penaliseOrthogonalSharedPathsAtConnEnds.ordinal()] ||
                                     (cross.crossingFlags & ConnectorCrossings.CROSSING_SHARES_PATH_AT_END) == 0)) {
                         // We are penalising fixedSharedPaths and there is one.
                         crossingConnInfo.addCrossing(connI, connJ);
@@ -1864,34 +1891,6 @@ public class Router {
     // Testing and debugging methods
     // -----------------------------------------------------------------------
 
-    public boolean existsOrthogonalSegmentOverlap() {
-        return existsOrthogonalSegmentOverlap(false);
-    }
-
-    public boolean existsOrthogonalSegmentOverlap(boolean atEnds) {
-        List<ConnRef> connList = new ArrayList<>(m_connectors);
-        for (int i = 0; i < connList.size(); i++) {
-            Polygon iRoute = new Polygon(connList.get(i).displayRoute());
-            for (int j = i + 1; j < connList.size(); j++) {
-                Polygon jRoute = new Polygon(connList.get(j).displayRoute());
-                ConnectorCrossings cross = new ConnectorCrossings(
-                        iRoute, true, jRoute, connList.get(i), connList.get(j));
-                cross.checkForBranchingSegments = true;
-                for (int jInd = 1; jInd < jRoute.size(); ++jInd) {
-                    boolean finalSegment = ((jInd + 1) == jRoute.size());
-                    cross.countForSegment(jInd, finalSegment);
-
-                    if ((cross.crossingFlags & ConnectorCrossings.CROSSING_SHARES_PATH) != 0 &&
-                            (atEnds ||
-                                    (cross.crossingFlags & ConnectorCrossings.CROSSING_SHARES_PATH_AT_END) == 0)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     public boolean existsOrthogonalFixedSegmentOverlap() {
         return existsOrthogonalFixedSegmentOverlap(false);
     }
@@ -1991,11 +1990,6 @@ public class Router {
     // -----------------------------------------------------------------------
     // Hyperedge improvement results
     // -----------------------------------------------------------------------
-
-    // Translated from Router::newAndDeletedObjectListsFromHyperedgeImprovement() in router.cpp line 3090.
-    public HyperedgeNewAndDeletedObjectLists newAndDeletedObjectListsFromHyperedgeImprovement() {
-        return m_hyperedge_improver.newAndDeletedObjectLists();
-    }
 
     // Stub for debug output — no-op in the Java translation.
     public void outputDiagram(String filename) {
