@@ -38,21 +38,11 @@ import java.util.Queue;
  */
 public class PtOrder {
 
-    /** A pair of (Point, ConnRef) representing a point belonging to a connector. */
-    public static class PtConnPtrPair {
-        public Point point;
-        public ConnRef conn;
-        public PtConnPtrPair(Point point, ConnRef conn) {
-            this.point = point;
-            this.conn = conn;
-        }
-    }
-
     // One for each dimension.
     private final boolean[] sorted = new boolean[2];
-    private final List<PtConnPtrPair>[] nodes;
+    private final List<Pair<Point,ConnRef>>[] nodes;
     private final List<int[]>[] links; // pairs of (from, to) indices
-    private final List<PtConnPtrPair>[] sortedConnVector;
+    private final List<Pair<Point,ConnRef>>[] sortedConnVector;
 
     @SuppressWarnings("unchecked")
     public PtOrder() {
@@ -75,16 +65,16 @@ public class PtOrder {
             sort(dim);
         }
         for (int i = 0; i < sortedConnVector[dim].size(); ++i) {
-            if (sortedConnVector[dim].get(i).conn == conn) {
+            if (sortedConnVector[dim].get(i).second == conn) {
                 return i;
             }
         }
         return -1;
     }
 
-    private int insertPoint(int dim, PtConnPtrPair pointPair) {
+    private int insertPoint(int dim, Pair<Point, ConnRef> pointPair) {
         for (int i = 0; i < nodes[dim].size(); ++i) {
-            if (nodes[dim].get(i).conn == pointPair.conn) {
+            if (nodes[dim].get(i).second == pointPair.second) {
                 return i;
             }
         }
@@ -92,10 +82,10 @@ public class PtOrder {
         return nodes[dim].size() - 1;
     }
 
-    public void addOrderedPoints(int dim, PtConnPtrPair innerArg,
-            PtConnPtrPair outerArg, boolean swapped) {
-        PtConnPtrPair inner = swapped ? outerArg : innerArg;
-        PtConnPtrPair outer = swapped ? innerArg : outerArg;
+    public void addOrderedPoints(int dim, Pair<Point, ConnRef> innerArg,
+            Pair<Point, ConnRef> outerArg, boolean swapped) {
+        var inner = swapped ? outerArg : innerArg;
+        var outer = swapped ? innerArg : outerArg;
 
         int innerIndex = insertPoint(dim, inner);
         int outerIndex = insertPoint(dim, outer);

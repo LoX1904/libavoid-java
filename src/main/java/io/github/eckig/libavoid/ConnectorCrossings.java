@@ -301,10 +301,10 @@ class ConnectorCrossings {
                                 } else if (thisDir != prevDir) reversed = !reversed;
                                 int orientation = (ap.x == an.x) ? 0 : 1;
                                 PtOrder ptOrderAn = pointOrders.computeIfAbsent(an, _ -> new PtOrder());
-                                ptOrderAn.addOrderedPoints(orientation, new PtOrder.PtConnPtrPair(bn, polyConnRef), new PtOrder.PtConnPtrPair(an, connConnRef), reversed);
+                                ptOrderAn.addOrderedPoints(orientation, new Pair<>(bn, polyConnRef), new Pair<>(an, connConnRef), reversed);
                                 assert ap.equals(bp);
                                 PtOrder ptOrderAp = pointOrders.computeIfAbsent(ap, _ -> new PtOrder());
-                                ptOrderAp.addOrderedPoints(orientation, new PtOrder.PtConnPtrPair(bp, polyConnRef), new PtOrder.PtConnPtrPair(ap, connConnRef), reversed);
+                                ptOrderAp.addOrderedPoints(orientation, new Pair<>(bp, polyConnRef), new Pair<>(ap, connConnRef), reversed);
                                 prevDir = thisDir;
                             }
                         }
@@ -324,8 +324,8 @@ class ConnectorCrossings {
                         boolean reversedX = ((a0.x < a1.x) || (a2.x < a1.x));
                         boolean reversedY = ((a0.y < a1.y) || (a2.y < a1.y));
                         PtOrder ptOrderB1 = pointOrders.computeIfAbsent(b1, _ -> new PtOrder());
-                        ptOrderB1.addOrderedPoints(0, new PtOrder.PtConnPtrPair(b1, polyConnRef), new PtOrder.PtConnPtrPair(a1, connConnRef), !reversedX);
-                        ptOrderB1.addOrderedPoints(1, new PtOrder.PtConnPtrPair(b1, polyConnRef), new PtOrder.PtConnPtrPair(a1, connConnRef), !reversedY);
+                        ptOrderB1.addOrderedPoints(0, new Pair<>(b1, polyConnRef), new Pair<>(a1, connConnRef), !reversedX);
+                        ptOrderB1.addOrderedPoints(1, new Pair<>(b1, polyConnRef), new Pair<>(a1, connConnRef), !reversedY);
                     }
                     crossingFlags |= CROSSING_TOUCHES;
                 }
