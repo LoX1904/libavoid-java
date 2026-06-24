@@ -56,7 +56,5 @@ public class TestBuildOrthogonalChannelInfo
             end2 = new ConnEnd(junction502411221);
             new ConnRef(router1, end1, end2);
             router1.processTransaction();
-
-            router1.outputDiagram("output/buildOrthogonalChannelInfo1");
     }
 }

@@ -457,7 +457,6 @@ public class TestValidPaths
         connRef960638799.setRoutingType(ConnType.Orthogonal);
 
         router.processTransaction();
-        router.outputDiagram("output/validPaths01");
         int result = router.existsInvalidOrthogonalPaths();
         assertEquals(0, result);
     }
@@ -509,7 +508,6 @@ public class TestValidPaths
         connRef744282799.setRoutingType(ConnType.Orthogonal);
 
         router.processTransaction();
-        router.outputDiagram("output/validPaths02");
         int result = router.existsInvalidOrthogonalPaths();
         assertEquals(0, result);
     }

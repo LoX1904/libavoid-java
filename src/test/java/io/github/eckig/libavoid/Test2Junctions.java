@@ -59,7 +59,6 @@ public class Test2Junctions
         ConnRef conn18168360 = new ConnRef(router1, end1, end2);
 
         router1.processTransaction();
-        router1.outputDiagram("output/2junctions-1");
 
         poly = new Polygon(4);
         poly.setPoint(0, new Point(50879, 50885));
@@ -92,7 +91,6 @@ public class Test2Junctions
         conn149180423.makePathInvalid();
 
         router1.processTransaction();
-        router1.outputDiagram("output/2junctions-2");
 
         boolean atEnds = true;
         boolean overlap = router1.existsOrthogonalFixedSegmentOverlap(atEnds);

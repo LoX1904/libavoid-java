@@ -1996,14 +1996,6 @@ public class TestCppPortoverlappingRects
     connRef209.setDestEndpoint(dstPt209);
     connRef209.setRoutingType(ConnType.Orthogonal);
     router.processTransaction();
-    router.outputDiagram("output/overlappingRects");
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

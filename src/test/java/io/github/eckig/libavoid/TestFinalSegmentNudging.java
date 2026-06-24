@@ -81,7 +81,6 @@ public class TestFinalSegmentNudging
 
 
         router.processTransaction();
-        router.outputDiagram("output/finalSegmentNudging1");
 
         boolean optimisedForConnectorType = true;
         int crossings = router.existsCrossings(optimisedForConnectorType);

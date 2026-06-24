@@ -46,14 +46,6 @@ public class TestCppPorttjunct
     ConnEnd dstPt716502036 = new ConnEnd(new Point(51800, 50925), 15);
     new ConnRef(router, srcPt716502036, dstPt716502036, 716502036);
     router.processTransaction();
-    router.outputDiagram("output/tjunct");
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

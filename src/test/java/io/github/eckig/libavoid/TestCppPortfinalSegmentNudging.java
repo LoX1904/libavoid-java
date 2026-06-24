@@ -69,7 +69,6 @@ public class TestCppPortfinalSegmentNudging
     connRef726.setDestEndpoint(dstPt726);
     connRef726.setRoutingType(ConnType.Orthogonal);
     router.processTransaction();
-    router.outputDiagram("output/finalSegmentNudging1");
     boolean optimisedForConnectorType = true;
     int crossings = router.existsCrossings(optimisedForConnectorType);
     assertFalse(crossings > 0);
@@ -150,7 +149,6 @@ public class TestCppPortfinalSegmentNudging
         connRef50.setDestEndpoint(dstPt50);
         connRef50.setRoutingType(ConnType.Orthogonal);
         router.processTransaction();
-        router.outputDiagram("output/finalSegmentNudging2");
         boolean atEnds = true;
         boolean overlap = router.existsOrthogonalFixedSegmentOverlap(atEnds);
         assertFalse(overlap);
@@ -214,7 +212,6 @@ public class TestCppPortfinalSegmentNudging
         connRef184.setDestEndpoint(dstPt184);
         connRef184.setRoutingType(ConnType.Orthogonal);
         router.processTransaction();
-        router.outputDiagram("output/finalSegmentNudging3");
         boolean optimisedForConnectorType = false;
         int crossings = router.existsCrossings(optimisedForConnectorType);
         assertFalse(crossings > 0);

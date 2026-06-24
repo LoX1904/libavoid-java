@@ -1986,13 +1986,4 @@ public class Router {
         }
         return count;
     }
-
-    // -----------------------------------------------------------------------
-    // Hyperedge improvement results
-    // -----------------------------------------------------------------------
-
-    // Stub for debug output — no-op in the Java translation.
-    public void outputDiagram(String filename) {
-        // C++ outputs SVG debug diagrams; not implemented in Java.
-    }
 }

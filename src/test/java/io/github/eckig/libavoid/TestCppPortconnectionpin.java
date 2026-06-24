@@ -31,29 +31,21 @@ public class TestCppPortconnectionpin
     dstEnd = new ConnEnd(shapeRef3, INPUT);
     new ConnRef(router, srcEnd, dstEnd);
     router.processTransaction();
-    router.outputDiagram("output/connectionpin02-1");
     router.moveShape(shapeRef1, 0, 90);
     router.moveShape(shapeRef2, 0, -90);
     router.processTransaction();
-    router.outputDiagram("output/connectionpin02-2");
     router.moveShape(shapeRef3, 0, -60);
     router.processTransaction();
-    router.outputDiagram("output/connectionpin02-3");
     shapeRef3.transformConnectionPinPositions(ShapeRef.ShapeTransformationType.TransformationType_CW90);
     router.processTransaction();
-    router.outputDiagram("output/connectionpin02-4");
     shapeRef3.transformConnectionPinPositions(ShapeRef.ShapeTransformationType.TransformationType_CW180);
     router.processTransaction();
-    router.outputDiagram("output/connectionpin02-5");
     shapeRef3.transformConnectionPinPositions(ShapeRef.ShapeTransformationType.TransformationType_CW270);
     router.processTransaction();
-    router.outputDiagram("output/connectionpin02-6");
     shapeRef3.transformConnectionPinPositions(ShapeRef.ShapeTransformationType.TransformationType_FlipX);
     router.processTransaction();
-    router.outputDiagram("output/connectionpin02-7");
     shapeRef3.transformConnectionPinPositions(ShapeRef.ShapeTransformationType.TransformationType_FlipY);
     router.processTransaction();
-    router.outputDiagram("output/connectionpin02-8");
     }
 
     @Test
@@ -332,6 +324,5 @@ public class TestCppPortconnectionpin
         connRef985644192.setDestEndpoint(dstPt985644192);
         connRef985644192.setRoutingType(ConnType.Orthogonal);
         router.processTransaction();
-        router.outputDiagram("output/connectionpin03");
     }
 }

@@ -26,7 +26,6 @@ public class TestInlineOverlap
         ConnEnd dstPt240732432 = new ConnEnd(new Point(51800, 50800), 1);
         new ConnRef(router, srcPt240732432, dstPt240732432, 240732432);
         router.processTransaction();
-        router.outputDiagram("output/inlineoverlap01");
         boolean overlap = router.existsOrthogonalTouchingPaths();
         assertFalse(overlap);
     }
@@ -425,7 +424,6 @@ public class TestInlineOverlap
         connRef54.setRoutingType(ConnType.Orthogonal);
 
         router.processTransaction();
-        router.outputDiagram("output/inlineOverlap09");
         boolean overlap = router.existsOrthogonalFixedSegmentOverlap();
         assertFalse(overlap);
     }

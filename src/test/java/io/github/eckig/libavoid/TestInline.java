@@ -35,6 +35,5 @@ public class TestInline
         new ConnRef(router, srcPt, dstPt);
 
         router.processTransaction();
-        router.outputDiagram("output/inline");
     }
 }

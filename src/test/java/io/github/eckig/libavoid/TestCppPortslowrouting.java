@@ -1213,14 +1213,6 @@ JunctionRef junctionRef990913310 = new JunctionRef(router, new Point(24000, 2702
     connRef952588978.setDestEndpoint(dstPt952588978);
     connRef952588978.setRoutingType(ConnType.Orthogonal);
     router.processTransaction();
-    router.outputDiagram("output/slowrouting");
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

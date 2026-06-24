@@ -152,7 +152,6 @@ public class TestCornerOverlap
         connRef23433311.setRoutingType(ConnType.Orthogonal);
 
         router.processTransaction();
-        router.outputDiagram("output/corneroverlap01");
         boolean touching = router.existsOrthogonalTouchingPaths();
         assertFalse(touching);
     }

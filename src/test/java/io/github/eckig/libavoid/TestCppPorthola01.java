@@ -746,14 +746,6 @@ public class TestCppPorthola01
     connRef.setDestEndpoint(dstPt);
     connRef.setRoutingType(ConnType.Orthogonal);
     router.processTransaction();
-    router.outputDiagram("output/hola01");
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

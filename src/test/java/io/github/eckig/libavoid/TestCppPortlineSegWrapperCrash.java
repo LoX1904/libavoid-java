@@ -1616,7 +1616,6 @@ public class TestCppPortlineSegWrapperCrash
     connRef207.setDestEndpoint(dstPt207);
     connRef207.setRoutingType(ConnType.Orthogonal);
     router.processTransaction();
-    router.outputDiagram("output/lineSegWrapperCrash1");
     }
 
     @Test
@@ -3231,7 +3230,6 @@ public class TestCppPortlineSegWrapperCrash
         connRef255.setDestEndpoint(dstPt255);
         connRef255.setRoutingType(ConnType.Orthogonal);
         router.processTransaction();
-        router.outputDiagram("output/lineSegWrapperCrash2");
     }
 
     @Test
@@ -4846,7 +4844,6 @@ public class TestCppPortlineSegWrapperCrash
         connRef197.setDestEndpoint(dstPt197);
         connRef197.setRoutingType(ConnType.Orthogonal);
         router.processTransaction();
-        router.outputDiagram("output/lineSegWrapperCrash3");
     }
 
     @Test
@@ -6461,7 +6458,6 @@ public class TestCppPortlineSegWrapperCrash
         connRef246.setDestEndpoint(dstPt246);
         connRef246.setRoutingType(ConnType.Orthogonal);
         router.processTransaction();
-        router.outputDiagram("output/lineSegWrapperCrash4");
     }
 
     @Test
@@ -8076,7 +8072,6 @@ public class TestCppPortlineSegWrapperCrash
         connRef210.setDestEndpoint(dstPt210);
         connRef210.setRoutingType(ConnType.Orthogonal);
         router.processTransaction();
-        router.outputDiagram("output/lineSegWrapperCrash5");
     }
 
     @Test
@@ -9691,7 +9686,6 @@ public class TestCppPortlineSegWrapperCrash
         connRef183.setDestEndpoint(dstPt183);
         connRef183.setRoutingType(ConnType.Orthogonal);
         router.processTransaction();
-        router.outputDiagram("output/lineSegWrapperCrash6");
     }
 
     @Test
@@ -11306,7 +11300,6 @@ public class TestCppPortlineSegWrapperCrash
         connRef172.setDestEndpoint(dstPt172);
         connRef172.setRoutingType(ConnType.Orthogonal);
         router.processTransaction();
-        router.outputDiagram("output/lineSegWrapperCrash7");
     }
 
     @Test
@@ -12921,6 +12914,5 @@ public class TestCppPortlineSegWrapperCrash
         connRef167.setDestEndpoint(dstPt167);
         connRef167.setRoutingType(ConnType.Orthogonal);
         router.processTransaction();
-        router.outputDiagram("output/lineSegWrapperCrash8");
     }
 }

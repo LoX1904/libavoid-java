@@ -51,7 +51,6 @@ public class TestCppPortjunction
     ConnEnd dstPt716502036 = new ConnEnd(new Point(51800, 50925), 15);
     new ConnRef(router, srcPt716502036, dstPt716502036, 716502036);
     router.processTransaction();
-    router.outputDiagram("output/junction01");
     }
 
     @Test
@@ -96,10 +95,8 @@ public class TestCppPortjunction
         ConnEnd dstPt716502036 = new ConnEnd(new Point(51800, 50925), 15);
         new ConnRef(router, srcPt716502036, dstPt716502036, 716502036);
         router.processTransaction();
-        router.outputDiagram("output/junction02-1");
         router.moveJunction(junction478845150, 585, 0);
         router.processTransaction();
-        router.outputDiagram("output/junction02-2");
     }
 
     @Test
@@ -146,10 +143,8 @@ public class TestCppPortjunction
         ConnEnd dstPt716502036 = new ConnEnd(new Point(51800, 50925), 15);
         new ConnRef(router, srcPt716502036, dstPt716502036, 716502036);
         router.processTransaction();
-        router.outputDiagram("output/junction03-1");
         router.moveJunction(junctionRef478845150, 585, 0);
         router.processTransaction();
-        router.outputDiagram("output/junction03-2");
     }
 
     @Test
@@ -179,23 +174,17 @@ public class TestCppPortjunction
         ConnEnd dstEnd = new ConnEnd(shapeRef6, ShapeConnectionPin.CONNECTIONPIN_CENTRE);
         ConnRef conn1= new ConnRef(router, srcEnd, dstEnd);
         router.processTransaction();
-        router.outputDiagram("output/junction04-1");
         Pair<JunctionRef, ConnRef> newObjs =
                 conn1.splitAtSegment(2);
         router.processTransaction();
-        router.outputDiagram("output/junction04-2");
         ConnEnd srcEnd3 = new ConnEnd(shapeRef5, ShapeConnectionPin.CONNECTIONPIN_CENTRE);
         ConnEnd dstEnd3 = new ConnEnd(newObjs.first);
         new ConnRef(router, srcEnd3, dstEnd3);
         router.processTransaction();
-        router.outputDiagram("output/junction04-3");
         router.deleteConnector(conn1);
         conn1 = null;
         router.processTransaction();
-        router.outputDiagram("output/junction04-4");
         newObjs.first.removeJunctionAndMergeConnectors();
-        router.processTransaction();
-        router.outputDiagram("output/junction04-5");
         router.processTransaction();
     }
 

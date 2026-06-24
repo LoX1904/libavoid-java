@@ -38,14 +38,6 @@ public class TestCppPortcomplex
     router.deleteShape(shapeRef);
     shapeRef = null;
     router.processTransaction();
-	router.outputDiagram("output/complex");
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

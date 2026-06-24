@@ -26,14 +26,6 @@ public class TestCppPortinfinity
     ConnEnd dstPt6 = new ConnEnd(new Point(51925,50000), 4);
     new ConnRef(router, srcPt6, dstPt6, 6);
     router.processTransaction();
-    router.outputDiagram("output/infinity");
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

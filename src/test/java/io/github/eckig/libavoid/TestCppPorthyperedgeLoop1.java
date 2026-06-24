@@ -49,13 +49,11 @@ public class TestCppPorthyperedgeLoop1
 	end2 = new ConnEnd(shape149922619, 2);
 	ConnRef conn199495942 = new ConnRef(router1, end1, end2);
 	router1.processTransaction();
-	router1.outputDiagram("output/hyperedgeLoop1-1");
 	end1 = new ConnEnd(shape147006780, 2);
 	end2 = new ConnEnd(junction228834480);
 	ConnRef conn8326760 = new ConnRef(router1, end1, end2);
 	conn8326760.makePathInvalid();
 	router1.processTransaction(); 
-	router1.outputDiagram("output/hyperedgeLoop1-2");
 	router1.deleteShape(shape147006780);
 	shape147006780 = null;
 	router1.deleteShape(shape69758810);
@@ -73,11 +71,4 @@ public class TestCppPorthyperedgeLoop1
 	router1.processTransaction();
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

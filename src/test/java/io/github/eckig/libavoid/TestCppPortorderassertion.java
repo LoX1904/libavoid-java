@@ -1473,14 +1473,6 @@ public class TestCppPortorderassertion
     connRef315.setDestEndpoint(dstPt315);
     connRef315.setRoutingType(ConnType.Orthogonal);
     router.processTransaction();
-    router.outputDiagram("output/orderassertion");
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

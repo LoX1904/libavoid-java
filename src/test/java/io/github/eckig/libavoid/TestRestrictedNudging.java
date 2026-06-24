@@ -67,7 +67,6 @@ public class TestRestrictedNudging
         connRef421608980.setRoutingType(ConnType.Orthogonal);
 
         router.processTransaction();
-        router.outputDiagram("output/restrictedNudging");
 
         boolean overlap = router.existsOrthogonalTouchingPaths();
         assertFalse(overlap);

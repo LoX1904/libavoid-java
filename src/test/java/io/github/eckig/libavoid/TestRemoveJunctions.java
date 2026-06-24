@@ -83,7 +83,6 @@ public class TestRemoveJunctions
 
         ConnRef mergedConn = junctionRef6.removeJunctionAndMergeConnectors();
         router.processTransaction();
-        router.outputDiagram("output/removeJunctions01");
 
         Pair<ConnEnd, ConnEnd> ends = mergedConn.endpointConnEnds();
 

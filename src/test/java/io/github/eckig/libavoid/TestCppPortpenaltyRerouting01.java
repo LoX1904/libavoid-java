@@ -301,7 +301,6 @@ public class TestCppPortpenaltyRerouting01
     newRoute.setPoint(1, new Point(464, 506));
     connRef.setFixedRoute(newRoute);
     router.processTransaction();
-    router.outputDiagram("output/penaltyRerouting01");
     int crossings = router.existsCrossings();
     assertFalse(crossings > 0);
     }

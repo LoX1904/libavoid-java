@@ -24,14 +24,6 @@ public class TestCppPortexample
     router.processTransaction();
     router.moveShape(shapeRef, 0.5, 0);
     router.processTransaction();
-    router.outputDiagram("output/example");
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

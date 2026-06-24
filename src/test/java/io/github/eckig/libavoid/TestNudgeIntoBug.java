@@ -40,7 +40,6 @@ public class TestNudgeIntoBug
         new ConnRef(router, srcPt144520410, dstPt144520410, 144520410);
         new ConnRef(router, srcPt463223880, dstPt463223880, 463223880);
         router.processTransaction();
-        router.outputDiagram("output/nudgeintobug");
         boolean overlap = router.existsOrthogonalFixedSegmentOverlap();
         boolean touching = router.existsOrthogonalTouchingPaths();
         assertFalse(overlap);

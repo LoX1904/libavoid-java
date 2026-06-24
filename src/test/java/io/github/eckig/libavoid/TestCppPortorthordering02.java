@@ -78,16 +78,8 @@ public class TestCppPortorthordering02
     connRef387080925.setDestEndpoint(dstPt387080925);
     connRef387080925.setRoutingType(ConnType.Orthogonal);
     router.processTransaction();
-    router.outputDiagram("output/orthordering-02");
     int crossings = router.existsCrossings();
     assertFalse(crossings > 0);
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

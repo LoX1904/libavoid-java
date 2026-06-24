@@ -88,7 +88,6 @@ public class TestOrthOrdering
         connRef387080925.setRoutingType(ConnType.Orthogonal);
 
         router.processTransaction();
-        router.outputDiagram("output/orthordering-01");
 
         int crossings = router.existsCrossings();
         final var retCode = (crossings > 0) ? 1 : 0;

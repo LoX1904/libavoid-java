@@ -59,14 +59,6 @@ public class TestCppPortnode1
     connRef45740440.setDestEndpoint(dstPt45740440);
     connRef45740440.setRoutingType(ConnType.Orthogonal);
     router.processTransaction();
-    router.outputDiagram("output/node1");
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

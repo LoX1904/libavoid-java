@@ -19,12 +19,10 @@ public class TestCppPortconnendmove
     Point srcPt = new Point(1.5, 4);
     ConnRef connRef = new ConnRef(router, srcPt, dstPt);
     router.processTransaction();
-    router.outputDiagram("output/connendmove-1");
     Point dstPt2 = new Point(20, 20);
     connRef.setDestEndpoint(dstPt2);
     router.moveShape(shapeRef1, 0.5, 0);
     router.processTransaction();
-    router.outputDiagram("output/connendmove-2");
     srcPt.x += 0.5;
     connRef.setSourceEndpoint(srcPt);
     router.moveShape(shapeRef1, 0.5, 0);
@@ -42,14 +40,6 @@ public class TestCppPortconnendmove
     router.moveShape(shapeRef1, 0.5, 0);
     router.moveShape(shapeRef2, 0, 0.5);
     router.processTransaction();
-    router.outputDiagram("output/connendmove-3");
     }
 
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
-    }
 }

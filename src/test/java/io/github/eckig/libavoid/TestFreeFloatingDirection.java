@@ -3321,7 +3321,6 @@ public class TestFreeFloatingDirection
         connRef410.setRoutingType(ConnType.Orthogonal);
 
         router.processTransaction();
-        router.outputDiagram("output/freeFloatingDirection01");
         assertEquals(4, connRef239.displayRoute().size());
     }
 }

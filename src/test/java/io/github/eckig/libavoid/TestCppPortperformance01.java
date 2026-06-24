@@ -43,7 +43,6 @@ public class TestCppPortperformance01
     initPerformance01Part11();
     initPerformance01Part12();
     router.processTransaction();
-    router.outputDiagram("output/performance01");
     }
 
 
@@ -5823,12 +5822,5 @@ public class TestCppPortperformance01
     dstPt = new ConnEnd(new Point(317.466, 86.9179), 15);
     connRef.setDestEndpoint(dstPt);
     connRef.setRoutingType(ConnType.Orthogonal);
-    }
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
     }
 }

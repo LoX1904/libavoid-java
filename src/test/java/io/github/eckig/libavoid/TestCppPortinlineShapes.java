@@ -85,14 +85,5 @@ public class TestCppPortinlineShapes
     connRef11.setDestEndpoint(dstPt11);
     connRef11.setRoutingType(ConnType.Orthogonal);
     router.processTransaction();
-    router.outputDiagram("output/inlineShapes");
-    }
-
-    private static void resizePolygon(Polygon polygon, int size)
-    {
-        polygon.ps.clear();
-        while (polygon.ps.size() < size) {
-            polygon.ps.add(new Point());
-        }
     }
 }

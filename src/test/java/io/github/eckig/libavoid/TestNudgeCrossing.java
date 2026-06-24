@@ -84,7 +84,6 @@ public class TestNudgeCrossing
         connRef220.setRoutingType(ConnType.Orthogonal);
 
         router.processTransaction();
-        router.outputDiagram("output/nudgeCrossing01");
 
         boolean optimisedForConnectorType = false;
         int crossings = router.existsCrossings(optimisedForConnectorType);
