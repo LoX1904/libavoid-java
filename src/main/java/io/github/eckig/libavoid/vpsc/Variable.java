@@ -31,19 +31,16 @@ import java.util.List;
  * Separation Constraints problem.
  * Translated from vpsc.h/vpsc.cpp in libavoid C++.
  */
-public class Variable
-{
+public class Variable {
 
-    public enum Id
-    {
+    public enum Id {
         freeSegmentID,
         fixedSegmentID,
         channelLeftID,
-        channelRightID;
+        channelRightID
     }
 
-    public enum Weight
-    {
+    public enum Weight {
         freeWeight(0.00001),
         strongWeight(0.001),
         strongerWeight(1.0),
@@ -87,14 +84,6 @@ public class Variable
 
     public Variable(Id id, double desiredPos, Weight weight) {
         this(id, desiredPos, weight, 1.0);
-    }
-
-    public Variable(Id id, double desiredPos) {
-        this(id, desiredPos, Weight.strongerWeight, 1.0);
-    }
-
-    public Variable(Id id) {
-        this(id, -1.0, Weight.strongerWeight, 1.0);
     }
 
     public double dfdv() {

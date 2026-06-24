@@ -41,9 +41,6 @@ import java.util.TreeSet;
  */
 final class OrthogonalRouter {
 
-    static final int XDIM = 0;
-    static final int YDIM = 1;
-
     // ScanVisDirFlag constants
     static final int VisDirNone = 0;
     static final int VisDirUp = 1;
@@ -56,7 +53,7 @@ final class OrthogonalRouter {
     // =========================================================================
 
     static int getPosVertInfDirections(VertInf v, int dim) {
-        if (dim == XDIM) {
+        if (dim == Point.XDIM) {
             int dirs = v.visDirections & (ConnDirFlag.ConnDirLeft | ConnDirFlag.ConnDirRight);
             if (dirs == (ConnDirFlag.ConnDirLeft | ConnDirFlag.ConnDirRight)) {
                 return (VisDirDown | VisDirUp);
@@ -65,7 +62,7 @@ final class OrthogonalRouter {
             } else if (dirs == ConnDirFlag.ConnDirRight) {
                 return VisDirUp;
             }
-        } else if (dim == YDIM) {
+        } else if (dim == Point.YDIM) {
             int dirs = v.visDirections & (ConnDirFlag.ConnDirDown | ConnDirFlag.ConnDirUp);
             if (dirs == (ConnDirFlag.ConnDirDown | ConnDirFlag.ConnDirUp)) {
                 return (VisDirDown | VisDirUp);
@@ -275,7 +272,7 @@ final class OrthogonalRouter {
             for (VertInf v : vertInfs) {
                 if (v.point.x > finishPos) break;
                 breakPoints.add(new PosVertInf(v.point.x, v,
-                        getPosVertInfDirections(v, XDIM)));
+                        getPosVertInfDirections(v, Point.XDIM)));
                 if (firstIntersectionPt == null && v.point.x == finishPos) {
                     firstIntersectionPt = v;
                 }
@@ -295,7 +292,7 @@ final class OrthogonalRouter {
             boolean seenShapeEdge = false;
             for (PosVertInf nvert : breakPoints) {
                 int mask = 0;
-                if (dim == XDIM) {
+                if (dim == Point.XDIM) {
                     if (seenConnPt) mask |= VertInf.XL_CONN;
                     if (seenShapeEdge) mask |= VertInf.XL_EDGE;
                 } else {
@@ -311,7 +308,7 @@ final class OrthogonalRouter {
             seenShapeEdge = false;
             for (PosVertInf rvert : breakPoints.descendingSet()) {
                 int mask = 0;
-                if (dim == XDIM) {
+                if (dim == Point.XDIM) {
                     if (seenConnPt) mask |= VertInf.XH_CONN;
                     if (seenShapeEdge) mask |= VertInf.XH_EDGE;
                 } else {
@@ -360,7 +357,7 @@ final class OrthogonalRouter {
             for (VertInf v : vertInfs) {
                 if (v.point.x == begin) {
                     vertLine.breakPoints.add(new PosVertInf(pos, v,
-                            getPosVertInfDirections(v, YDIM)));
+                            getPosVertInfDirections(v, Point.YDIM)));
                 }
             }
         }
@@ -377,7 +374,7 @@ final class OrthogonalRouter {
             for (VertInf v : vertInfs) {
                 if (v.point.x == finish) {
                     vertLine.breakPoints.add(new PosVertInf(pos, v,
-                            getPosVertInfDirections(v, YDIM)));
+                            getPosVertInfDirections(v, Point.YDIM)));
                 }
             }
         }
@@ -543,13 +540,13 @@ final class OrthogonalRouter {
                 if (inVertSegRegion) {
                     horiLine.addEdgeHorizontal(router);
                     horiLine.insertBreakpointsFinish(router, vertLine);
-                    horiLine.generateVisibilityEdgesFromBreakpointSet(router, XDIM);
+                    horiLine.generateVisibilityEdgesFromBreakpointSet(router, Point.XDIM);
                     it.remove();
                     continue;
                 }
             } else if (vertLine.pos > horiLine.finish) {
                 horiLine.addEdgeHorizontal(router);
-                horiLine.generateVisibilityEdgesFromBreakpointSet(router, XDIM);
+                horiLine.generateVisibilityEdgesFromBreakpointSet(router, Point.XDIM);
                 it.remove();
                 continue;
             } else {
@@ -561,13 +558,13 @@ final class OrthogonalRouter {
                             horiLine.addEdgeHorizontalTillIntersection(router, vertLine);
                     for (VertInf v : intersectionVerts) {
                         vertLine.breakPoints.add(new PosVertInf(horiLine.pos, v,
-                                getPosVertInfDirections(v, YDIM)));
+                                getPosVertInfDirections(v, Point.YDIM)));
                     }
                 }
             }
         }
 
-        vertLine.generateVisibilityEdgesFromBreakpointSet(router, YDIM);
+        vertLine.generateVisibilityEdgesFromBreakpointSet(router, Point.YDIM);
     }
 
     // =========================================================================
@@ -598,12 +595,12 @@ final class OrthogonalRouter {
 
         if (pass == 2) {
             if ((e.type == EventType.Open) || (e.type == EventType.Close)) {
-                double lineY = (e.type == EventType.Open) ? v.min[YDIM] : v.max[YDIM];
+                double lineY = (e.type == EventType.Open) ? v.min[Point.YDIM] : v.max[Point.YDIM];
 
-                double minShape = v.min[XDIM];
-                double maxShape = v.max[XDIM];
+                double minShape = v.min[Point.XDIM];
+                double maxShape = v.max[Point.XDIM];
                 double[] limits = new double[4];
-                v.findFirstPointAboveAndBelow(XDIM, lineY, limits);
+                v.findFirstPointAboveAndBelow(Point.XDIM, lineY, limits);
                 double minLimit = limits[0];
                 double maxLimit = limits[1];
                 double minLimitMax = limits[2];
@@ -645,9 +642,9 @@ final class OrthogonalRouter {
                 VertInf centreVert = e.v.c;
                 Point cp = centreVert.point;
 
-                double minLimit = v.firstPointAbove(XDIM);
-                double maxLimit = v.firstPointBelow(XDIM);
-                boolean inShape = v.isInsideShape(XDIM);
+                double minLimit = v.firstPointAbove(Point.XDIM);
+                double maxLimit = v.firstPointBelow(Point.XDIM);
+                boolean inShape = v.isInsideShape(Point.XDIM);
 
                 LineSegment line1 = null, line2 = null;
                 if ((centreVert.visDirections & ConnDirFlag.ConnDirLeft) != 0 && (minLimit < cp.x)) {
@@ -709,12 +706,12 @@ final class OrthogonalRouter {
 
         if (pass == 2) {
             if ((e.type == EventType.Open) || (e.type == EventType.Close)) {
-                double lineX = (e.type == EventType.Open) ? v.min[XDIM] : v.max[XDIM];
+                double lineX = (e.type == EventType.Open) ? v.min[Point.XDIM] : v.max[Point.XDIM];
 
-                double minShape = v.min[YDIM];
-                double maxShape = v.max[YDIM];
+                double minShape = v.min[Point.YDIM];
+                double maxShape = v.max[Point.YDIM];
                 double[] limits = new double[4];
-                v.findFirstPointAboveAndBelow(YDIM, lineX, limits);
+                v.findFirstPointAboveAndBelow(Point.YDIM, lineX, limits);
                 double minLimit = limits[0];
                 double maxLimit = limits[1];
                 double minLimitMax = limits[2];
@@ -749,8 +746,8 @@ final class OrthogonalRouter {
                 VertInf centreVert = e.v.c;
                 Point cp = centreVert.point;
 
-                double minLimit = v.firstPointAbove(YDIM);
-                double maxLimit = v.firstPointBelow(YDIM);
+                double minLimit = v.firstPointAbove(Point.YDIM);
+                double maxLimit = v.firstPointBelow(Point.YDIM);
 
                 if ((centreVert.visDirections & ConnDirFlag.ConnDirUp) != 0 && (minLimit < cp.y)) {
                     segments.insert(new LineSegment(minLimit, cp.y, e.pos));
@@ -956,7 +953,7 @@ final class OrthogonalRouter {
         for (Iterator<LineSegment> it = segments.list.iterator(); it.hasNext(); ) {
             LineSegment horiLine = it.next();
             horiLine.addEdgeHorizontal(router);
-            horiLine.generateVisibilityEdgesFromBreakpointSet(router, XDIM);
+            horiLine.generateVisibilityEdgesFromBreakpointSet(router, Point.XDIM);
             it.remove();
         }
     }

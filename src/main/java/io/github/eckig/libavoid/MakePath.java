@@ -518,7 +518,6 @@ public class MakePath {
             }
 
             for (EdgeInf edge : visList) {
-                if (edge.isDisabled()) continue;
 
                 VertInf nodeInf = edge.otherVert(bestNodeInf);
                 ANode node = new ANode(nodeInf, timestamp++);

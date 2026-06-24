@@ -49,7 +49,6 @@ public class ConnRef {
     boolean m_false_path;
     boolean m_needs_repaint;
     boolean m_active;
-    boolean m_initialised;
     boolean m_hate_crossings;
     boolean m_has_fixed_route;
     Polygon m_route;
@@ -350,22 +349,6 @@ public class ConnRef {
     }
 
     /**
-     * Sets the routing type for this connector.
-     * Corresponds to ConnRef::setRoutingType(ConnType).
-     */
-    public void setHateCrossings(boolean value) {
-        m_hate_crossings = value;
-    }
-
-    /**
-     * Returns whether this connector hates crossings.
-     * Corresponds to ConnRef::doesHateCrossings().
-     */
-    public boolean doesHateCrossings() {
-        return m_hate_crossings;
-    }
-
-    /**
      * Returns possible destination pin points.
      * Corresponds to ConnRef::possibleDstPinPoints().
      */
@@ -433,60 +416,11 @@ public class ConnRef {
     }
 
     /**
-     * Sets a fixed existing route for this connector (keeps current endpoints).
-     * Corresponds to ConnRef::setFixedExistingRoute().
-     */
-    public void setFixedExistingRoute() {
-        assert m_route.size() >= 2;
-        m_has_fixed_route = true;
-        m_router.registerSettingsChange();
-    }
-
-    /**
      * Returns whether this connector has a fixed route.
      * Corresponds to ConnRef::hasFixedRoute().
      */
     public boolean hasFixedRoute() {
         return m_has_fixed_route;
-    }
-
-    /**
-     * Clears the fixed route, allowing automatic rerouting.
-     * Corresponds to ConnRef::clearFixedRoute().
-     */
-    public void clearFixedRoute() {
-        m_has_fixed_route = false;
-        makePathInvalid();
-        m_router.registerSettingsChange();
-    }
-
-    /**
-     * Returns an array of [srcConnEnd, dstConnEnd] for this connector.
-     * Used by HyperedgeTreeNode and HyperedgeTreeEdge.
-     */
-    public ConnEnd[] endpointConnEndsArray() {
-        ConnEnd[] result = new ConnEnd[2];
-        result[0] = new ConnEnd();
-        result[1] = new ConnEnd();
-        getConnEndForEndpointVertex(m_src_vert, result, 0);
-        getConnEndForEndpointVertex(m_dst_vert, result, 1);
-        return result;
-    }
-
-    /**
-     * 1-arg version of getConnEndForEndpointVertex — returns ConnEnd or null.
-     * Used by HyperedgeTreeEdge.
-     */
-    public ConnEnd getConnEndForEndpointVertex(VertInf vertex) {
-        ConnEnd[] result = new ConnEnd[]{null};
-        if (vertex == m_src_vert) {
-            result[0] = new ConnEnd();
-            getConnEndForEndpointVertex(m_src_vert, result, 0);
-        } else if (vertex == m_dst_vert) {
-            result[0] = new ConnEnd();
-            getConnEndForEndpointVertex(m_dst_vert, result, 0);
-        }
-        return result[0];
     }
 
     /**
@@ -531,39 +465,6 @@ public class ConnRef {
      */
     VertInf start() {
         return m_start_vert;
-    }
-
-    /**
-     * Returns whether this connector is initialised (active).
-     * Corresponds to ConnRef::isInitialised().
-     */
-    public boolean isInitialised() {
-        return m_active;
-    }
-
-    /**
-     * Uninitialises this connector (removes vertices, makes inactive).
-     * Corresponds to ConnRef::unInitialise().
-     * TODO why not used
-     */
-    void unInitialise() {
-        m_router.vertices.removeVertex(m_src_vert);
-        m_router.vertices.removeVertex(m_dst_vert);
-        makeInactive();
-    }
-
-    /**
-     * Removes this connector's vertices from the visibility graph.
-     * Corresponds to ConnRef::removeFromGraph().
-     * TODO why not used
-     */
-    void removeFromGraph() {
-        if (m_src_vert != null) {
-            m_src_vert.removeFromGraph();
-        }
-        if (m_dst_vert != null) {
-            m_dst_vert.removeFromGraph();
-        }
     }
 
     /**
@@ -793,26 +694,6 @@ public class ConnRef {
                         m_dst_vert.visDirections);
             }
         }
-    }
-
-    /**
-     * Returns the obstacles anchoring the source and destination endpoints.
-     * Corresponds to ConnRef::endpointAnchors().
-     */
-    Obstacle[] endpointAnchors() {
-        Obstacle srcAnchor = null;
-        Obstacle dstAnchor = null;
-
-        if (m_src_connend != null) {
-            srcAnchor = m_src_connend.m_anchor_obj;
-        }
-        if (m_dst_connend != null) {
-            dstAnchor = m_dst_connend.m_anchor_obj;
-        }
-        if (srcAnchor == null && dstAnchor == null) {
-            return null;
-        }
-        return new Obstacle[]{srcAnchor, dstAnchor};
     }
 
     /**
@@ -1150,21 +1031,5 @@ public class ConnRef {
         ConnEnd[] arr = new ConnEnd[]{result};
         getConnEndForEndpointVertex(m_dst_vert, arr, 0);
         return arr[0];
-    }
-
-    // ensureEndpointVertices() removed — no-op invented method.
-    // Vertices are created in common_updateEndPoint() during processTransaction().
-
-    /**
-     * Disconnect from anchors and clean up (compatibility method).
-     * TODO why not used
-     */
-    void disconnect() {
-        if (m_src_connend != null) {
-            m_src_connend.disconnect();
-        }
-        if (m_dst_connend != null) {
-            m_dst_connend.disconnect();
-        }
     }
 }

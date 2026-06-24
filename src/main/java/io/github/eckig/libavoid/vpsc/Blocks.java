@@ -58,75 +58,6 @@ public class Blocks {
         m_blocks.add(block);
     }
 
-    public void mergeLeft(Block r) {
-        r.timeStamp = ++blockTimeCtr;
-        r.setUpInConstraints();
-        Constraint c = r.findMinInConstraint();
-        while (c != null && c.slack() < 0) {
-            r.deleteMinInConstraint();
-            Block l = c.left.block;
-            if (l.in == null) l.setUpInConstraints();
-            double dist = c.right.offset - c.left.offset - c.gap;
-            if (r.vars.size() < l.vars.size()) {
-                dist = -dist;
-                // swap l and r
-                Block tmp = l;
-                l = r;
-                r = tmp;
-            }
-            blockTimeCtr++;
-            r.mergeBlock(l, c, dist);
-            r.mergeIn(l);
-            r.timeStamp = blockTimeCtr;
-            removeBlock(l);
-            c = r.findMinInConstraint();
-        }
-    }
-
-    public void mergeRight(Block l) {
-        l.setUpOutConstraints();
-        Constraint c = l.findMinOutConstraint();
-        while (c != null && c.slack() < 0) {
-            l.deleteMinOutConstraint();
-            Block r = c.right.block;
-            r.setUpOutConstraints();
-            double dist = c.left.offset + c.gap - c.right.offset;
-            if (l.vars.size() > r.vars.size()) {
-                dist = -dist;
-                // swap l and r
-                Block tmp = l;
-                l = r;
-                r = tmp;
-            }
-            l.mergeBlock(r, c, dist);
-            l.mergeOut(r);
-            removeBlock(r);
-            c = l.findMinOutConstraint();
-        }
-    }
-
-    /**
-     * Split block b on constraint c, then merge the resulting halves with
-     * their neighbours.
-     * Translated from vpsc.cpp:651-673 (Blocks::split).
-     */
-    public void split(Block b, Block[] result, Constraint c) {
-        b.split(result, c);
-        Block l = result[0];
-        Block r = result[1];
-        m_blocks.add(l);
-        m_blocks.add(r);
-        r.posn = b.posn;
-        mergeLeft(l);
-        // r may have been merged!
-        r = c.right.block;
-        r.updateWeightedPosition();
-        mergeRight(r);
-        removeBlock(b);
-        assert !Double.isNaN(l.posn);
-        assert !Double.isNaN(r.posn);
-    }
-
     /**
      * Clears up deleted blocks from the blocks list.
      * Handles removal in-place with a single linear pass.
@@ -154,9 +85,5 @@ public class Blocks {
             c += b.cost();
         }
         return c;
-    }
-
-    private void removeBlock(Block doomed) {
-        doomed.deleted = true;
     }
 }

@@ -407,37 +407,5 @@ public class ConnEnd {
 
         return ang;
     }
-
-    /**
-     * Returns a (addedVertex, VertInf) pair for use during hyperedge rerouting.
-     * If this ConnEnd is attached to a shape/junction, finds the matching pin vertex.
-     * Otherwise creates a new temporary vertex at m_point.
-     * Translated from ConnEnd::getHyperedgeVertex in connend.cpp.
-     */
-    Pair<Boolean, VertInf> getHyperedgeVertex(Router router) {
-        boolean addedVertex = false;
-        VertInf vertex = null;
-
-        if (m_anchor_obj != null) {
-            for (ShapeConnectionPin currPin : m_anchor_obj.m_connection_pins) {
-                if ((currPin.m_class_id == m_connection_pin_class_id) &&
-                        (!currPin.m_exclusive || currPin.m_connend_users.isEmpty())) {
-                    vertex = currPin.m_vertex;
-                }
-            }
-            assert vertex != null;
-        } else {
-            VertID id = new VertID(0, Point.kUnassignedVertexNumber, VertID.PROP_ConnPoint);
-            vertex = new VertInf(router, id, m_point);
-            vertex.visDirections = m_directions;
-            addedVertex = true;
-
-            if (router.m_allows_polyline_routing) {
-                Visibility.vertexVisibility(vertex, null, true, true);
-            }
-        }
-
-        return new Pair<>(addedVertex, vertex);
-    }
 }
 

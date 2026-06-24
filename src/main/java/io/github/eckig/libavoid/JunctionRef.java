@@ -33,13 +33,11 @@ import java.util.Iterator;
 public class JunctionRef extends Obstacle {
 
     private Point m_position;
-    private Point m_recommended_position;
     private boolean m_position_fixed;
 
     public JunctionRef(Router router, Point position, int id) {
         super(router, makeRectangle(router, position), id);
         m_position = new Point(position);
-        m_recommended_position = new Point(position);
         m_position_fixed = false;
 
         // For Junctions we use a single non-exclusive pin.
@@ -100,17 +98,8 @@ public class JunctionRef extends Obstacle {
         }
     }
 
-    public Point recommendedPosition() {
-        return new Point(m_recommended_position);
-    }
-
-    public void setRecommendedPosition(Point position) {
-        m_recommended_position = new Point(position);
-    }
-
     public void setPosition(Point position) {
         m_position = new Point(position);
-        m_recommended_position = new Point(position);
         m_polygon = makeRectangle(m_router, m_position);
         setNewPoly(m_polygon);
     }

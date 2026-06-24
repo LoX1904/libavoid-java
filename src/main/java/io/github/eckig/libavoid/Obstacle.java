@@ -333,19 +333,6 @@ public abstract class Obstacle {
     }
 
     /**
-     * Returns a list of ConnRefs attached to this obstacle.
-     * Corresponds to Obstacle::attachedConnectors() in C++.
-     */
-    public List<ConnRef> attachedConnectors() {
-        List<ConnRef> attachedConns = new ArrayList<>();
-        for (ConnEnd connEnd : m_following_conn_ends) {
-            assert connEnd.m_conn_ref != null;
-            attachedConns.add(connEnd.m_conn_ref);
-        }
-        return attachedConns;
-    }
-
-    /**
      * Returns possible pin points for the given pin class ID.
      * Corresponds to Obstacle::possiblePinPoints(unsigned int) in C++.
      */

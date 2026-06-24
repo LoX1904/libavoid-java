@@ -177,52 +177,6 @@ public class VertInf {
         removeFromGraph(true);
     }
 
-    // C++ directionFrom
-    public int directionFrom(VertInf other) {
-        double epsilon = 0.000001;
-        Point diff = point.subtract(other.point);
-
-        int directions = ConnDirFlag.ConnDirNone;
-        if (diff.y > epsilon) {
-            directions |= ConnDirFlag.ConnDirUp;
-        }
-        if (diff.y < -epsilon) {
-            directions |= ConnDirFlag.ConnDirDown;
-        }
-        if (diff.x > epsilon) {
-            directions |= ConnDirFlag.ConnDirRight;
-        }
-        if (diff.x < -epsilon) {
-            directions |= ConnDirFlag.ConnDirLeft;
-        }
-        return directions;
-    }
-
-    // C++ setVisibleDirections
-    public void setVisibleDirections(int directions) {
-        for (EdgeInf edge : visList) {
-            if (directions == ConnDirFlag.ConnDirAll) {
-                edge.setDisabled(false);
-            } else {
-                VertInf otherVert = edge.otherVert(this);
-                int direction = otherVert.directionFrom(this);
-                boolean visible = (direction & directions) != 0;
-                edge.setDisabled(!visible);
-            }
-        }
-
-        for (EdgeInf edge : orthogVisList) {
-            if (directions == ConnDirFlag.ConnDirAll) {
-                edge.setDisabled(false);
-            } else {
-                VertInf otherVert = edge.otherVert(this);
-                int direction = otherVert.directionFrom(this);
-                boolean visible = (direction & directions) != 0;
-                edge.setDisabled(!visible);
-            }
-        }
-    }
-
     // C++ pathLeadsBackTo — number of points in path from this back to start, or 0
     public int pathLeadsBackTo(VertInf start) {
         int pathlen = 1;
@@ -239,25 +193,6 @@ public class VertInf {
             assert pathlen < 20000 : "Apparent infinite connector path";
         }
         return pathlen;
-    }
-
-    // --- Tree root pointer support (for MTST) ---
-    // C++ uses VertInf** (pointer to pointer). In Java we share a 1-element array.
-    public VertInf[] makeTreeRootPointer(VertInf root) {
-        m_treeRoot = new VertInf[]{root};
-        return m_treeRoot;
-    }
-
-    public VertInf treeRoot() {
-        return (m_treeRoot != null) ? m_treeRoot[0] : null;
-    }
-
-    public VertInf[] treeRootPointer() {
-        return m_treeRoot;
-    }
-
-    public void setTreeRootPointer(VertInf[] pointer) {
-        m_treeRoot = pointer;
     }
 
     @Override

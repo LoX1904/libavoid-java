@@ -41,13 +41,11 @@ public class EdgeInf {
     private boolean m_added;
     private boolean m_visible;
     private final boolean m_orthogonal;
-    private boolean m_disabled;
     private final VertInf m_vert1;
     private final VertInf m_vert2;
     // C++ uses list iterators for O(1) removal. In Java we just use the list directly.
     private final List<boolean[]> m_conns;  // C++ FlagList — list of boolean* flags
     private double m_dist;
-    private double m_mtst_dist;
 
     public EdgeInf(VertInf v1, VertInf v2) {
         this(v1, v2, false);
@@ -61,11 +59,9 @@ public class EdgeInf {
         this.m_added = false;
         this.m_visible = false;
         this.m_orthogonal = orthogonal;
-        this.m_disabled = false;
         this.m_vert1 = v1;
         this.m_vert2 = v2;
         this.m_dist = -1;
-        this.m_mtst_dist = 0;
 
         assert v1 != null && v2 != null;
         assert v1._router == v2._router;
@@ -122,11 +118,6 @@ public class EdgeInf {
         m_blocker = b;
     }
 
-    // C++ added
-    public boolean added() {
-        return m_added;
-    }
-
     // C++ isOrthogonal
     public boolean isOrthogonal() {
         return (m_vert1.point.x == m_vert2.point.x) ||
@@ -139,29 +130,9 @@ public class EdgeInf {
                (m_vert2.id.isConnectionPin() && m_vert1.id.isConnPt());
     }
 
-    // C++ isDisabled
-    public boolean isDisabled() {
-        return m_disabled;
-    }
-
-    // C++ setDisabled
-    public void setDisabled(boolean disabled) {
-        m_disabled = disabled;
-    }
-
     // C++ blocker
     public int blocker() {
         return m_blocker;
-    }
-
-    // C++ mtstDist
-    public double mtstDist() {
-        return m_mtst_dist;
-    }
-
-    // C++ setMtstDist
-    public void setMtstDist(double joinCost) {
-        m_mtst_dist = joinCost;
     }
 
     // C++ otherVert

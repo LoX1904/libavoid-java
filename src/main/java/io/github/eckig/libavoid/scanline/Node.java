@@ -25,6 +25,7 @@ package io.github.eckig.libavoid.scanline;
 
 import io.github.eckig.libavoid.Box;
 import io.github.eckig.libavoid.Obstacle;
+import io.github.eckig.libavoid.Point;
 import io.github.eckig.libavoid.VertInf;
 
 /**
@@ -33,9 +34,6 @@ import io.github.eckig.libavoid.VertInf;
  * Translated from scanline.h/scanline.cpp in libavoid C++.
  */
 public class Node {
-
-    public static final int XDIM = 0;
-    public static final int YDIM = 1;
 
     public Obstacle v;      // obstacle (shape/junction)
     public VertInf c;        // connector point VertInf (for ConnPoint events)
@@ -59,10 +57,10 @@ public class Node {
         this.firstBelow = null;
 
         Box bBox = v.routingBox();
-        min[XDIM] = bBox.min.x;
-        min[YDIM] = bBox.min.y;
-        max[XDIM] = bBox.max.x;
-        max[YDIM] = bBox.max.y;
+        min[Point.XDIM] = bBox.min.x;
+        min[Point.YDIM] = bBox.min.y;
+        max[Point.XDIM] = bBox.max.x;
+        max[Point.YDIM] = bBox.max.y;
     }
 
     /** Constructor for ConnPoint events (VertInf-based). */
@@ -74,8 +72,8 @@ public class Node {
         this.pos = p;
         this.firstAbove = null;
         this.firstBelow = null;
-        min[XDIM] = max[XDIM] = c.point.x;
-        min[YDIM] = max[YDIM] = c.point.y;
+        min[Point.XDIM] = max[Point.XDIM] = c.point.x;
+        min[Point.YDIM] = max[Point.YDIM] = c.point.y;
     }
 
     public Node(ShiftSegment ss, double p) {
@@ -86,7 +84,7 @@ public class Node {
         this.firstAbove = null;
         this.firstBelow = null;
         // These values shouldn't ever be used, so they don't matter.
-        min[XDIM] = max[XDIM] = min[YDIM] = max[YDIM] = 0;
+        min[Point.XDIM] = max[Point.XDIM] = min[Point.YDIM] = max[Point.YDIM] = 0;
     }
 
     /**

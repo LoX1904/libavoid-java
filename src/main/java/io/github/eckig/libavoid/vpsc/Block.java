@@ -25,7 +25,6 @@ package io.github.eckig.libavoid.vpsc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.PriorityQueue;
 
 /**
  * A Block of variables in the VPSC solver. A block contains one or more
@@ -39,8 +38,6 @@ public class Block {
     public PositionStats ps;
     public boolean deleted;
     public long timeStamp;
-    public PriorityQueue<Constraint> in;
-    public PriorityQueue<Constraint> out;
 
     // Parent container, that holds the blockTimeCtr.
     Blocks blocks;
@@ -50,8 +47,6 @@ public class Block {
         this.posn = 0;
         this.deleted = false;
         this.timeStamp = 0;
-        this.in = null;
-        this.out = null;
         this.blocks = blocks;
         this.ps = new PositionStats();
         if (v != null) {
@@ -82,33 +77,6 @@ public class Block {
         assert !Double.isNaN(posn);
     }
 
-    public void setUpInConstraints() {
-        setUpConstraintHeap(true);
-    }
-
-    public void setUpOutConstraints() {
-        setUpConstraintHeap(false);
-    }
-
-    private void setUpConstraintHeap(boolean isIn) {
-        PriorityQueue<Constraint> h = new PriorityQueue<>();
-        for (Variable v : vars) {
-            List<Constraint> cs = isIn ? v.in : v.out;
-            for (Constraint c : cs) {
-                c.timeStamp = blocks.blockTimeCtr;
-                if ((c.left.block != this && isIn) ||
-                    (c.right.block != this && !isIn)) {
-                    h.add(c);
-                }
-            }
-        }
-        if (isIn) {
-            this.in = h;
-        } else {
-            this.out = h;
-        }
-    }
-
     public Block merge(Block b, Constraint c) {
         double dist = c.right.offset - c.left.offset - c.gap;
         Block l = c.left.block;
@@ -137,76 +105,6 @@ public class Block {
         posn = (ps.AD - ps.AB) / ps.A2;
         assert !Double.isNaN(posn);
         b.deleted = true;
-    }
-
-    public void mergeIn(Block b) {
-        // Check the top of the heaps to remove possible internal constraints
-        findMinInConstraint();
-        b.findMinInConstraint();
-        while (b.in != null && !b.in.isEmpty()) {
-            in.add(b.in.poll());
-        }
-    }
-
-    public void mergeOut(Block b) {
-        findMinOutConstraint();
-        b.findMinOutConstraint();
-        while (b.out != null && !b.out.isEmpty()) {
-            if (out == null) {
-                out = new PriorityQueue<>();
-            }
-            out.add(b.out.poll());
-        }
-    }
-
-    public Constraint findMinInConstraint() {
-        if (in == null || in.isEmpty()) return null;
-        Constraint v;
-        List<Constraint> outOfDate = new ArrayList<>();
-        while (!in.isEmpty()) {
-            v = in.peek();
-            Block lb = v.left.block;
-            Block rb = v.right.block;
-            if (lb == rb) {
-                // constraint has been merged into the same block
-                in.poll();
-            } else if (v.timeStamp < lb.timeStamp) {
-                // block at other end has been moved since this
-                in.poll();
-                outOfDate.add(v);
-            } else {
-                break;
-            }
-        }
-        for (Constraint c : outOfDate) {
-            c.timeStamp = blocks.blockTimeCtr;
-            in.add(c);
-        }
-        if (in.isEmpty()) {
-            v = null;
-        } else {
-            v = in.peek();
-        }
-        return v;
-    }
-
-    public Constraint findMinOutConstraint() {
-        if (out == null || out.isEmpty()) return null;
-        Constraint v = out.peek();
-        while (v.left.block == v.right.block) {
-            out.poll();
-            if (out.isEmpty()) return null;
-            v = out.peek();
-        }
-        return v;
-    }
-
-    public void deleteMinInConstraint() {
-        if (in != null && !in.isEmpty()) in.poll();
-    }
-
-    public void deleteMinOutConstraint() {
-        if (out != null && !out.isEmpty()) out.poll();
     }
 
     /**
