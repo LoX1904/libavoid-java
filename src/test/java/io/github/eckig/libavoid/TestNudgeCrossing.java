@@ -17,7 +17,6 @@ public class TestNudgeCrossing
         router.setRoutingParameter(Router.RoutingParameter.fixedSharedPathPenalty, 0);
         router.setRoutingParameter(Router.RoutingParameter.portDirectionPenalty, 100);
         router.setRoutingOption(Router.RoutingOption.nudgeOrthogonalSegmentsConnectedToShapes, true);
-        router.setRoutingOption(Router.RoutingOption.improveHyperedgeRoutesMovingJunctions, true);
         router.setRoutingOption(Router.RoutingOption.penaliseOrthogonalSharedPathsAtConnEnds, false);
         router.setRoutingOption(Router.RoutingOption.nudgeOrthogonalTouchingColinearSegments, false);
 

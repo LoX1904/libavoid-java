@@ -17,7 +17,6 @@ public class TestFinalSegmentNudging
         router.setRoutingPenalty(Router.RoutingParameter.fixedSharedPathPenalty, 0);
         router.setRoutingPenalty(Router.RoutingParameter.portDirectionPenalty, 100);
         router.setRoutingOption(Router.RoutingOption.nudgeOrthogonalSegmentsConnectedToShapes, true);
-        router.setRoutingOption(Router.RoutingOption.improveHyperedgeRoutesMovingJunctions, true);
         router.setRoutingOption(Router.RoutingOption.penaliseOrthogonalSharedPathsAtConnEnds, false);
 
         Polygon poly12 = new Polygon(4);

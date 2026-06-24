@@ -15,7 +15,7 @@ public class TestRestrictedNudging
         router.setRoutingPenalty(2, 200);
         router.setRoutingPenalty(3, 4000);
         router.setRoutingPenalty(4, 110);
-        router.setRoutingParameter(Router.RoutingParameter.idealNudgingDistance.value, 25);
+        router.setRoutingParameter(Router.RoutingParameter.idealNudgingDistance, 25);
 
         Polygon poly282634758=new Polygon(4);
         poly282634758.setPoint(0, new Point(51360, 50215));

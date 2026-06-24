@@ -1,1 +1,1 @@
-This is an LLM based conversion of the original [C++ adaptagrams libavoid library](https://github.com/mjwybrow/adaptagrams) to java.
+This is an LLM based conversion of the original [C++ adaptagrams libavoid library](https://github.com/mjwybrow/adaptagrams) to java. The checkpoint system and hyperedge rerouting have been removed.

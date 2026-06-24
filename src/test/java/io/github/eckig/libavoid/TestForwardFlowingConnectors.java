@@ -20,11 +20,9 @@ public class TestForwardFlowingConnectors
         router.setRoutingParameter(Router.RoutingParameter.idealNudgingDistance, 10);
         router.setRoutingParameter(Router.RoutingParameter.reverseDirectionPenalty, 500);
         router.setRoutingOption(Router.RoutingOption.nudgeOrthogonalSegmentsConnectedToShapes, false);
-        router.setRoutingOption(Router.RoutingOption.improveHyperedgeRoutesMovingJunctions, true);
         router.setRoutingOption(Router.RoutingOption.penaliseOrthogonalSharedPathsAtConnEnds, false);
         router.setRoutingOption(Router.RoutingOption.nudgeOrthogonalTouchingColinearSegments, false);
         router.setRoutingOption(Router.RoutingOption.performUnifyingNudgingPreprocessingStep, true);
-        router.setRoutingOption(Router.RoutingOption.improveHyperedgeRoutesMovingAddingAndDeletingJunctions, true);
         Polygon polygon;
         ConnRef connRef;
         ConnEnd srcPt;

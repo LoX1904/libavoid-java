@@ -44,7 +44,6 @@ public class TestInlineOverlap
         router.setRoutingParameter(Router.RoutingParameter.shapeBufferDistance, 20);
         router.setRoutingParameter(Router.RoutingParameter.idealNudgingDistance, 40);
         router.setRoutingOption(Router.RoutingOption.nudgeOrthogonalSegmentsConnectedToShapes, false);
-        router.setRoutingOption(Router.RoutingOption.improveHyperedgeRoutesMovingJunctions, true);
         router.setRoutingOption(Router.RoutingOption.penaliseOrthogonalSharedPathsAtConnEnds, false);
         router.setRoutingOption(Router.RoutingOption.nudgeOrthogonalTouchingColinearSegments, false);
         Polygon poly1 = new Polygon(4);
