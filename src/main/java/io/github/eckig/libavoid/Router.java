@@ -1232,6 +1232,12 @@ public class Router {
         ImproveOrthogonalRoutes improver = new ImproveOrthogonalRoutes(this);
         improver.execute();
 
+        // Post-nudging: enforce that connectors with a ConnDirLeft destination
+        // arrive at the destination from the left (horizontal last segment).
+        for (ConnRef conn : reroutedConns) {
+            conn.enforceDestinationApproachDirection();
+        }
+
         // Alert connectors that they need redrawing.
         for (ConnRef conn : reroutedConns) {
             conn.m_needs_repaint = true;

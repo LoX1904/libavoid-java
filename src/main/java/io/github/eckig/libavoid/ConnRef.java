@@ -891,28 +891,43 @@ public class ConnRef {
             if (m_type == ConnType.Orthogonal) {
                 // For orthogonal routing, build an L-shaped fallback path so the
                 // connector at least looks reasonable instead of a diagonal line.
-                Point srcPoint = new Point(m_src_vert.point);
-                srcPoint.id = m_src_vert.id.objID;
-                srcPoint.vn = m_src_vert.id.vn;
-                Point dstPoint = new Point(tar.point);
-                dstPoint.id = tar.id.objID;
-                dstPoint.vn = tar.id.vn;
-                Point midPoint = new Point(srcPoint.x, dstPoint.y);
-                midPoint.id = 0;
-                midPoint.vn = Point.kUnassignedVertexNumber;
-
-                path.add(srcPoint);
-                path.add(midPoint);
-                path.add(dstPoint);
-                vertices.add(m_src_vert);
-                vertices.add(null);
-                vertices.add(tar);
+                buildOrthogonalFallbackPath(path, vertices, tar);
                 return;
             }
 
             // Polyline fallback: direct line (existing C++ behaviour).
             pathlen = 2;
             tar.pathNext = m_src_vert;
+        }
+
+        if (m_type == ConnType.Orthogonal && pathlen >= 2) {
+            // Fallback check: if the found path detours away from the destination
+            // (e.g. because shapeBufferDistance causes routing boxes to overlap and
+            // block the direct gap), replace it with a simple L-shaped path.
+            // We detect a detour by comparing the path's total Manhattan length
+            // against the direct src→dst Manhattan distance.
+            double directDist = Math.abs(tar.point.x - m_src_vert.point.x)
+                    + Math.abs(tar.point.y - m_src_vert.point.y);
+            if (directDist > 0) {
+                // Collect path in forward order to measure total Manhattan length.
+                List<VertInf> chain = new ArrayList<>();
+                for (VertInf curr = tar; curr != m_src_vert; curr = curr.pathNext) {
+                    chain.addFirst(curr);
+                }
+                chain.addFirst(m_src_vert);
+                double pathDist = 0;
+                for (int k = 1; k < chain.size(); k++) {
+                    pathDist += Math.abs(chain.get(k).point.x - chain.get(k - 1).point.x)
+                            + Math.abs(chain.get(k).point.y - chain.get(k - 1).point.y);
+                }
+                // If the path is more than 3x the direct distance, it is a detour.
+                if (pathDist > 3.0 * directDist) {
+                    path.clear();
+                    vertices.clear();
+                    buildOrthogonalFallbackPath(path, vertices, tar);
+                    return;
+                }
+            }
         }
 
         // Resize path and vertices
@@ -935,6 +950,139 @@ public class ConnRef {
         srcPt.id = m_src_vert.id.objID;
         srcPt.vn = m_src_vert.id.vn;
         path.set(0, srcPt);
+    }
+
+    // -----------------------------------------------------------------------
+    // Private helper methods
+    // -----------------------------------------------------------------------
+
+    /**
+     * Ensures the last segment of an orthogonal route arrives at the destination
+     * from the left (penultimate point x < dst.x).
+     *
+     * If the last segment is vertical (prev.x == dst.x) or comes from the right
+     * (prev.x > dst.x), a horizontal approach point is inserted at
+     * (dst.x - 1, dst.y) so the final segment is always horizontal from the left.
+     *
+     * This does NOT modify any other segment, so no diagonal segments are created.
+     *
+     * Called from Router after nudging, so it operates on m_display_route.
+     */
+    void enforceDestinationApproachDirection() {
+        if (m_type != ConnType.Orthogonal || m_dst_vert == null) {
+            return;
+        }
+        // Only enforce when the destination is exclusively ConnDirLeft.
+        // If multiple directions are allowed (e.g. visDir=15), the router
+        // already chose the best approach direction — don't override it.
+        if (m_dst_vert.visDirections != ConnDirFlag.ConnDirLeft) {
+            return;
+        }
+        // Use shapeBufferDistance as the minimum horizontal approach length so
+        // that arrowheads have enough visual space to render correctly.
+        double minApproach = m_router.routingParameter(Router.RoutingParameter.shapeBufferDistance);
+        if (minApproach <= 0) {
+            minApproach = 1;
+        }
+        // Operate on the display route (which may have been set by the nudger).
+        Polygon display = displayRoute();
+        enforceLastSegmentFromLeft(display.ps, minApproach);
+    }
+
+    private static void enforceLastSegmentFromLeft(List<Point> pts, double minApproach) {
+        if (pts.size() < 2) {
+            return;
+        }
+        Point dst = pts.getLast();
+        Point prev = pts.get(pts.size() - 2);
+
+        if (prev.x < dst.x) {
+            // Already arrives from the left — nothing to do.
+            return;
+        }
+
+        // The last segment does not arrive from the left.
+        // We need to insert a proper orthogonal detour so that the final
+        // segment is horizontal from the left.
+        //
+        // Case 1: last segment is vertical (prev.x == dst.x, prev.y != dst.y)
+        //   Route: ... → prev(x, y1) → dst(x, y2)
+        //   Fix:   ... → prev(x, y1) → (x-1, y1) → (x-1, y2) → dst(x, y2)
+        //
+        // Case 2: last segment comes from the right (prev.x > dst.x)
+        //   Route: ... → prev(x1, y) → dst(x2, y)  where x1 > x2
+        //   Fix:   ... → prev(x1, y) → (x2-1, y) → dst(x2, y)
+        //   (insert a single point just to the left of dst)
+
+        // The approach point must be at least minApproach units to the left of dst.
+        double approachX = dst.x - minApproach;
+
+        if (prev.x == dst.x) {
+            // Vertical last segment: prev(x, y1) → dst(x, y2).
+            // Check whether the segment before prev is horizontal (safe to shift prev.x)
+            // or vertical (must insert an extra bend point instead).
+            boolean prevSegmentIsHorizontal = pts.size() < 3
+                    || pts.get(pts.size() - 3).y == prev.y;
+
+            if (prevSegmentIsHorizontal) {
+                // Shift prev.x to approachX and insert one bend point:
+                //   ... → prev(approachX, y1) → (approachX, y2) → dst(x, y2)
+                // The segment before prev stays horizontal (same y, different x).
+                prev.x = approachX;
+                Point bend = new Point(approachX, dst.y);
+                bend.id = 0;
+                bend.vn = Point.kUnassignedVertexNumber;
+                pts.add(pts.size() - 1, bend);
+            } else {
+                // Segment before prev is vertical — insert two points to avoid diagonal:
+                //   ... → prev(x, y1) → (approachX, y1) → (approachX, y2) → dst(x, y2)
+                Point bend1 = new Point(approachX, prev.y);
+                bend1.id = 0;
+                bend1.vn = Point.kUnassignedVertexNumber;
+                Point bend2 = new Point(approachX, dst.y);
+                bend2.id = 0;
+                bend2.vn = Point.kUnassignedVertexNumber;
+                pts.add(pts.size() - 1, bend1);
+                pts.add(pts.size() - 1, bend2);
+            }
+        } else {
+            // Comes from the right — insert one approach point at approachX.
+            Point approach = new Point(approachX, dst.y);
+            approach.id = 0;
+            approach.vn = Point.kUnassignedVertexNumber;
+            pts.add(pts.size() - 1, approach);
+        }
+    }
+
+    /**
+     * Builds a simple L-shaped (two-segment) orthogonal fallback path from
+     * m_src_vert to tar. Used when no valid path is found or when the found
+     * path is a detour (e.g. routing boxes overlap due to shapeBufferDistance).
+     *
+     * The bend point is placed at (src.x, dst.y) so the connector goes
+     * horizontally first, then vertically.
+     */
+    private void buildOrthogonalFallbackPath(List<Point> path, List<VertInf> vertices, VertInf tar) {
+        Point srcPoint = new Point(m_src_vert.point);
+        srcPoint.id = m_src_vert.id.objID;
+        srcPoint.vn = m_src_vert.id.vn;
+        Point dstPoint = new Point(tar.point);
+        dstPoint.id = tar.id.objID;
+        dstPoint.vn = tar.id.vn;
+
+        // Place the bend so the last segment always arrives at the destination
+        // from the left (penultimate point x < dst.x).
+        double bendX = Math.min(srcPoint.x, dstPoint.x - 1);
+        Point midPoint = new Point(bendX, dstPoint.y);
+        midPoint.id = 0;
+        midPoint.vn = Point.kUnassignedVertexNumber;
+
+        path.add(srcPoint);
+        path.add(midPoint);
+        path.add(dstPoint);
+        vertices.add(m_src_vert);
+        vertices.add(null);
+        vertices.add(tar);
     }
 
     // -----------------------------------------------------------------------
